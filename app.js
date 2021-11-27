@@ -20,14 +20,42 @@ class CasillaTablero {
         this.color=color;
         this.tieneFicha=tieneFicha;
         this.id=id;
+        this.CasillaLimite=false;
         this.casillaCanvas=this.casillaCanvas;
     }
   }
+  class fichaTablero {
+    constructor(casilla,jugador,gameScene,casillaObjeto) {
+        this.casillaObjeto=casillaObjeto;
+        this.casilla=casilla;
+        this.jugador=jugador;
+        this.fichaCanvas=gameScene.add.circle(500, 500, 40, colorFichasPruebas).setInteractive();
+        this.fichaCanvas.on('pointerdown', function() {
+
+            casilla.setInteractive();
+            casilla.setStrokeStyle(4,0xE6EF2D);
+             });
+        
+         this.fichaCanvas.on('pointerup', function() {
+
+                casilla.setInteractive();
+                casilla.setStrokeStyle(0,0x000000);
+                 });
+    }
+    get movimientos(){
+        let casillasMovimientos =[];
+        let casillasMovimientosObject=[];
+    }
+    
+  }
+
 //casillasBoard : CasillaTablero = [64];
 let casillasBoard = [];
+let CasillasLimites=[];
 let fichasNegras = [];
 const colorFichasNegras = 0x3B292C;
 const colorFichasBlancas = 0x964C3E;
+const colorFichasPruebas= 0x44327E;
 let fichasBlancas=[];
 var game = new Phaser.Game(config);
 const casillas=[];
@@ -43,6 +71,8 @@ function preload ()
 
 function create ()
 {   
+
+
     let escena=this; 
    //this.add.image(400, 300, 'sky');
    //scene.input.enabled = enabled; // enabled: true/false
@@ -60,7 +90,7 @@ function create ()
     logo.setBounce(1, 1);
     logo.setCollideWorldBounds(true);
 
-    
+        let fichaLimite=false;
         let coordenadaX=100;
         let coordenadaY=100;
         const colorNegrasTablero=0xBB7F36;
@@ -105,21 +135,9 @@ function create ()
             
         }
         
-        let casillaPrueba= new CasillaTablero(0,0,0,false,0,this.add.rectangle(0,0,40,40,0xefc53f));
-    
-        let myFicha=this.add.circle(600, 800, 40, 0xc70039).setInteractive();
-        myFicha.on('pointerdown', function() {
-            console.log('ficha seleccionada');
-
-        });
-        this.input.setDraggable(myFicha);
+        //let casillaPrueba= new CasillaTablero(0,0,0,false,0,this.add.rectangle(0,0,40,40,0xefc53f));
         
-        this.input.on('drag', function (pointer, myFicha, dragX, dragY) {
 
-            myFicha.x = dragX;
-            myFicha.y = dragY;
-    
-        });
 
         function colocarFichasNegras(){
             var positionX;
@@ -133,7 +151,7 @@ function create ()
                 fichasNegras[i]=escena.add.circle(positionX, positionY, 40, colorFichasNegras).setInteractive();
                 fichasNegras[i].on('pointerdown', function() {
                 console.log('ficha seleccionada');
-                console.log("Has selecionado una fichas Blanca");
+                console.log("Has selecionado una fichas Negra");
 
                  });
             }
@@ -149,6 +167,20 @@ function create ()
                 console.log("Has selecionado una fichas Negra");
 
                  });
+            }
+        }
+        function actualizarFichasLimites(){
+            const numFilas=8;
+            const numColumnas=8;
+            for (let i = 0; i < numFilas; i++) {
+                for (let j = 0; j < numColumnas; j++) {
+                    if (i==0 || i == numFilas-1 || j==0 || j==numColumnas-1) {
+                        casillasBoard[(i*8)+j].CasillaLimite=true;
+                        CasillasLimites.push(casillas[(i*8)+j]);
+                    }
+                }
+                
+                
             }
         }
         function colocarFichasBlancas(){
@@ -170,7 +202,7 @@ function create ()
             for (let index = 1; index < 7; index++) {
                 positionX=casillasBoard[(index+1)*8-1].posX;
                 positionY=casillasBoard[(index+1)*8-1].posY;
-
+                
                 //Añadimos la fichita
                 fichasBlancas[i]=escena.add.circle(positionX, positionY, 40, colorFichasBlancas).setInteractive();
                 fichasBlancas[i].on('pointerdown', function() {
@@ -182,13 +214,16 @@ function create ()
             //Ultima fila
             
         }
+        actualizarFichasLimites();
         colocarFichasBlancas();
         colocarFichasNegras();
-        console.log(casillas.length);
-        casillas[1].setStrokeStyle(4, 0xefc53f);   
-        casillas[8].setInteractive();
-        casillas[8].setStrokeStyle(4, 0x4D4B85);
-        console.log(casillasBoard[62]);
+        function pintarBordeTablero(){
+            CasillasLimites.forEach(element => {
+                element.setInteractive();
+                element.setStrokeStyle(4,0xE6EF2D);
+            });
+        }
+        //pintarBordeTablero();
         
         casillasBoard.forEach(element => {
             console.log(element);
@@ -201,8 +236,11 @@ function create ()
             // ...
          });
          */
-        console.log(casillaPrueba);
+        
         console.log(casillasBoard[1].posX+":"+casillasBoard[1].posY);
     emitter.startFollow(logo);
+    let myFichaPrueba = new fichaTablero(casillas[36],"blancas",this,casillasBoard[36]);
+   
+    console.log(myFichaPrueba);
     //tablero();
 }
