@@ -14,12 +14,13 @@ var config = {
     }
 };
 class CasillaTablero {
-    constructor(posX, posY,color,tieneFicha,id,casillaCanvas) {
+    constructor(posX, posY,color,tieneFicha,id,_casillaCanvas,idTablero) {
         this.posX=posX;
         this.posY=posY;
         this.color=color;
         this.tieneFicha=tieneFicha;
         this.id=id;
+        this.idTablero=idTablero;
         this.CasillaLimite=false;
         this.casillaCanvas=this.casillaCanvas;
     }
@@ -40,6 +41,7 @@ class CasillaTablero {
 
                 casilla.setInteractive();
                 casilla.setStrokeStyle(0,0x000000);
+                //console.log();
                  });
     }
     get movimientos(){
@@ -53,13 +55,26 @@ class CasillaTablero {
 let casillasBoard = [];
 let CasillasLimites=[];
 let fichasNegras = [];
+let identificadoresTablero=[];
 const colorFichasNegras = 0x3B292C;
 const colorFichasBlancas = 0x964C3E;
 const colorFichasPruebas= 0x44327E;
 let fichasBlancas=[];
 var game = new Phaser.Game(config);
 const casillas=[];
-
+let numFilas=8;
+let numColumnas=8;
+let idTableroCalc="";
+let idTableroCalcFila="";
+const letrasTablero=["a","b","c","d","e","f","g","h"];
+for (let i = 0; i < numFilas; i++) {
+    idTableroCalcFila=""+8-i;
+    for (let j = 0; j < numColumnas; j++) {
+        idTableroCalc=idTableroCalcFila+letrasTablero[j];
+        identificadoresTablero[(i*8)+j]=idTableroCalc;
+    }
+    
+}
 function preload ()
 {
     this.load.setBaseURL('http://labs.phaser.io');
@@ -109,24 +124,24 @@ function create ()
                 if (tocaCambiarFila==false) {
                     if (i%2==0) {
                         //Esto es PAR
-                        casillas[fila*8+i] = this.add.rectangle(adjust+i*coordenadaX,adjust+fila*coordenadaY, ladoCasilla, ladoCasilla, colorNegrasTablero);
-                        casillasBoard[fila*8+i]= new CasillaTablero(adjust+i*coordenadaX,adjust+fila*coordenadaY,colorNegrasTablero,false,fila*8+i,casillas[fila*8+i]);
+                        casillas[fila*8+i] = this.add.rectangle(adjust+i*coordenadaX,adjust+fila*coordenadaY, ladoCasilla, ladoCasilla, colorBlancasTablero);
+                        casillasBoard[fila*8+i]= new CasillaTablero(adjust+i*coordenadaX,adjust+fila*coordenadaY,colorBlancasTablero,false,fila*8+i,casillas[fila*8+i],identificadoresTablero[fila*8+i]);
                     }
                     else
-                        casillas[fila*8+i] = this.add.rectangle(adjust+i*coordenadaX, adjust+fila*coordenadaY, ladoCasilla, ladoCasilla, colorBlancasTablero);
-                        casillasBoard[fila*8+i]= new CasillaTablero(adjust+i*coordenadaX,adjust+fila*coordenadaY,colorNegrasTablero,false,fila*8+i,casillas[fila*8+i]);
+                        casillas[fila*8+i] = this.add.rectangle(adjust+i*coordenadaX, adjust+fila*coordenadaY, ladoCasilla, ladoCasilla, colorNegrasTablero);
+                        casillasBoard[fila*8+i]= new CasillaTablero(adjust+i*coordenadaX,adjust+fila*coordenadaY,colorNegrasTablero,false,fila*8+i,casillas[fila*8+i],identificadoresTablero[fila*8+i]);
                     //casillas[i].setOrigin(0,0);
                     // console.log(casillas[i]);
                 }
                 else
                     if (i%2==0) {
                         //Esto es PAR
-                        casillas[fila*8+i] = this.add.rectangle(adjust+i*coordenadaX,adjust+fila*coordenadaY, ladoCasilla, ladoCasilla, colorBlancasTablero);
-                        casillasBoard[fila*8+i]= new CasillaTablero(adjust+i*coordenadaX,adjust+fila*coordenadaY,colorNegrasTablero,false,fila*8+i,casillas[fila*8+i]);
+                        casillas[fila*8+i] = this.add.rectangle(adjust+i*coordenadaX,adjust+fila*coordenadaY, ladoCasilla, ladoCasilla, colorNegrasTablero);
+                        casillasBoard[fila*8+i]= new CasillaTablero(adjust+i*coordenadaX,adjust+fila*coordenadaY,colorNegrasTablero,false,fila*8+i,casillas[fila*8+i],identificadoresTablero[fila*8+i]);
                     }
                     else
-                        casillas[fila*8+i] = this.add.rectangle(adjust+i*coordenadaX, adjust+fila*coordenadaY, ladoCasilla, ladoCasilla, colorNegrasTablero);
-                        casillasBoard[fila*8+i]= new CasillaTablero(adjust+i*coordenadaX,adjust+fila*coordenadaY,colorNegrasTablero,false,fila*8+i,casillas[fila*8+i]);
+                        casillas[fila*8+i] = this.add.rectangle(adjust+i*coordenadaX, adjust+fila*coordenadaY, ladoCasilla, ladoCasilla, colorBlancasTablero);
+                        casillasBoard[fila*8+i]= new CasillaTablero(adjust+i*coordenadaX,adjust+fila*coordenadaY,colorBlancasTablero,false,fila*8+i,casillas[fila*8+i],identificadoresTablero[fila*8+i]);
                     //casillas[i].setOrigin(0,0);
                     // console.log(casillas[i]);
                     
@@ -223,10 +238,33 @@ function create ()
                 element.setStrokeStyle(4,0xE6EF2D);
             });
         }
-        //pintarBordeTablero();
+        function verticalesFicha(fichita){
+            let casillasVerticales =[];
+            let casillaActual = fichita.casillaObjeto;
+            let idFichaFila=casillaActual.idTablero.split[0];
+            let idFichaColumna=casillaActual.idTablero.split[1];
+            let idFichaCalc=casillaActual.idTablero;
+            //let casillaCandidata;
+            for (let i = 1; idFichaCalc.includes("8"); i++) {
+                idFichaCalc=idFichaFila+i+""+idFichaColumna;
+                casillasVerticales.push();
+                
+            }
+            for (let i = 1; idFichaCalc.includes("1"); i--) {
+                idFichaCalc=idFichaFila-i+""+idFichaColumna;
+                casillasVerticales.push();
+                
+            }
+            console.log(casillasVerticales)
+            return casillasVerticales;
+        }
         
+        //pintarBordeTablero();
+    //    identificadoresTablero.forEach(element => {
+    //        console.log(element);
+    //    }); 
         casillasBoard.forEach(element => {
-            console.log(element);
+            //console.log(element);
         });
         /*this.input.on('pointerdown', function(pointer){
             var touchX = pointer.x;
@@ -237,10 +275,15 @@ function create ()
          });
          */
         
-        console.log(casillasBoard[1].posX+":"+casillasBoard[1].posY);
+    
     emitter.startFollow(logo);
     let myFichaPrueba = new fichaTablero(casillas[36],"blancas",this,casillasBoard[36]);
-   
-    console.log(myFichaPrueba);
+    casillasBoard[36].tieneFicha=true;
+    myFichaPrueba.fichaCanvas.on('pointerup', function() {
+
+       console.log(myFichaPrueba);
+         });
+    
     //tablero();
+    verticalesFicha(myFichaPrueba);
 }
