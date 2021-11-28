@@ -241,22 +241,42 @@ function create ()
         function verticalesFicha(fichita){
             let casillasVerticales =[];
             let casillaActual = fichita.casillaObjeto;
-            let idFichaFila=casillaActual.idTablero.split[0];
-            let idFichaColumna=casillaActual.idTablero.split[1];
-            let idFichaCalc=casillaActual.idTablero;
-            //let casillaCandidata;
-            for (let i = 1; idFichaCalc.includes("8"); i++) {
-                idFichaCalc=idFichaFila+i+""+idFichaColumna;
-                casillasVerticales.push();
-                
-            }
-            for (let i = 1; idFichaCalc.includes("1"); i--) {
-                idFichaCalc=idFichaFila-i+""+idFichaColumna;
-                casillasVerticales.push();
-                
-            }
+            let idFichaFila=parseInt(casillaActual.idTablero.split("")[0]);
+            let idFichaColumna=casillaActual.idTablero.split("")[1];
+
+            //console.log(idFichaFila+1);
+
+            //Primero las de abajo;
+            for (let i = 1;  idFichaFila-i>=1; i++) {
+                casillasVerticales.push((idFichaFila-i)+idFichaColumna);                
+             }
+            for (let i = 1;  idFichaFila+i<=8; i++) {
+                casillasVerticales.push((idFichaFila+i)+idFichaColumna);                
+             }
             console.log(casillasVerticales)
             return casillasVerticales;
+        }
+        function HorizontalesFicha(fichita){
+            const letrasTablero=["a","b","c","d","e","f","g","h"];
+            let casillasHorizontales =[];
+            let casillaActual = fichita.casillaObjeto;
+            let idFichaFila=casillaActual.idTablero.split("")[0];
+            let idFichaColumna=casillaActual.idTablero.split("")[1];
+            let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
+
+            console.log(indexLetrasCasilla);
+
+            //Primero las de abajo;
+            for (let i = 1;  indexLetrasCasilla-i>=0; i++) {
+                console.log(letrasTablero[indexLetrasCasilla-i]);
+                casillasHorizontales.push((idFichaFila)+letrasTablero[indexLetrasCasilla-i]);                
+             }
+             for (let i = 1;  indexLetrasCasilla+i<=7; i++) {
+                console.log(letrasTablero[indexLetrasCasilla+i]);
+                casillasHorizontales.push((idFichaFila)+letrasTablero[indexLetrasCasilla+i]);                
+             }
+            console.log(casillasHorizontales)
+            return casillasHorizontales;
         }
         
         //pintarBordeTablero();
@@ -286,4 +306,5 @@ function create ()
     
     //tablero();
     verticalesFicha(myFichaPrueba);
+    HorizontalesFicha(myFichaPrueba);
 }
