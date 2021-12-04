@@ -27,10 +27,13 @@ class CasillaTablero {
   }
   class fichaTablero {
     constructor(casilla,jugador,gameScene,casillaObjeto) {
+        casillaObjeto.tieneFicha=true;
         this.casillaObjeto=casillaObjeto;
         this.casilla=casilla;
         this.jugador=jugador;
-        this.fichaCanvas=gameScene.add.circle(500, 500, 40, colorFichasPruebas).setInteractive();
+        this.fichaPosX=casillaObjeto.posX;
+        this.fichaPosY=casillaObjeto.posY;
+        this.fichaCanvas=gameScene.add.circle(casillaObjeto.posX, casillaObjeto.posY, 40, colorFichasPruebas).setInteractive();
         this.fichaCanvas.on('pointerdown', function() {
 
             casilla.setInteractive();
@@ -229,6 +232,14 @@ function create ()
             //Ultima fila
             
         }
+        function getCasillaObjetoById(idBoard){
+            for (let i = 0; i < casillasBoard.length; i++) {
+                if(casillasBoard[i].idTablero.localeCompare(idBoard)==0){
+                    return casillasBoard[i].id
+                }
+                
+            }
+        }
         actualizarFichasLimites();
         colocarFichasBlancas();
         colocarFichasNegras();
@@ -278,7 +289,95 @@ function create ()
             console.log(casillasHorizontales)
             return casillasHorizontales;
         }
-        
+        function DiagonalDescendenteFicha(fichita){
+            const letrasTablero=["a","b","c","d","e","f","g","h"];
+            let casillasDiagonales =[];
+            let casillaActual = fichita.casillaObjeto;
+            let idFichaFila=parseInt(casillaActual.idTablero.split("")[0]);
+            let idFichaColumna=casillaActual.idTablero.split("")[1];
+            let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
+
+            console.log(indexLetrasCasilla);
+
+            //Primero las de abajo;
+            for (let i = 1;  indexLetrasCasilla-i>=0 && idFichaFila+i<=8; i++) {
+                casillasDiagonales.push((idFichaFila+i)+letrasTablero[indexLetrasCasilla-i]);                
+             }
+             for (let i = 1;  indexLetrasCasilla+i<=7 && idFichaFila-i>=1; i++) {
+                casillasDiagonales.push((idFichaFila-i)+letrasTablero[indexLetrasCasilla+i]);                
+             }
+            console.log(casillasDiagonales)
+            return casillasDiagonales;
+        }
+        function DiagonalAscendenteFicha(fichita){
+            const letrasTablero=["a","b","c","d","e","f","g","h"];
+            let casillasDiagonales =[];
+            let casillaActual = fichita.casillaObjeto;
+            let idFichaFila=parseInt(casillaActual.idTablero.split("")[0]);
+            let idFichaColumna=casillaActual.idTablero.split("")[1];
+            let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
+
+            console.log(indexLetrasCasilla);
+
+            //Primero las de abajo;
+            for (let i = 1;  indexLetrasCasilla+i<=7 && idFichaFila+i<=8; i++) {
+                casillasDiagonales.push((idFichaFila+i)+letrasTablero[indexLetrasCasilla+i]);                
+             }
+             for (let i = 1;  indexLetrasCasilla-i>=0 && idFichaFila-i>=1; i++) {
+                casillasDiagonales.push((idFichaFila-i)+letrasTablero[indexLetrasCasilla-i]);                
+             }
+            console.log(casillasDiagonales)
+            return casillasDiagonales;
+        }
+       function  casilla_sombrear(casilla_sombrear){
+            casilla_sombrear.setInteractive();
+            casilla_sombrear.setStrokeStyle(4,0xE6EF2D);
+
+       }
+       function  casilla_sombrearColor(casilla_sombrear,color){
+        casilla_sombrear.setInteractive();
+        casilla_sombrear.setStrokeStyle(4,color);
+
+   }
+       function  casilla_dessombrear(casilla_sombrear){
+            casilla_sombrear.setInteractive();
+            casilla_sombrear.setStrokeStyle(0,0x000000);
+
+   }
+        function casillas_sombrear_direcciones(Ficha){
+            let fichas_a_colorear=[];
+            let fichas_a_colorearDiagonal=[];
+            verticalesFicha(myFichaPrueba).forEach(element => {
+                fichas_a_colorear.push(getCasillaObjetoById(element));
+            });
+            HorizontalesFicha(myFichaPrueba).forEach(element => {
+                fichas_a_colorear.push(getCasillaObjetoById(element));
+            });
+            DiagonalDescendenteFicha(myFichaPrueba).forEach(element => {
+                fichas_a_colorearDiagonal.push(getCasillaObjetoById(element));
+            });
+            DiagonalAscendenteFicha(myFichaPrueba).forEach(element => {
+                fichas_a_colorearDiagonal.push(getCasillaObjetoById(element));
+            });
+            fichas_a_colorear.forEach(element => {
+                casilla_sombrear(casillas[element]);
+            });
+            fichas_a_colorearDiagonal.forEach(element => {
+                casilla_sombrearColor(casillas[element],0x9172AC);
+            });
+        }
+        function casillas_dessombrear_direcciones(Ficha){
+            let fichas_a_colorear=[];
+            verticalesFicha(myFichaPrueba).forEach(element => {
+                fichas_a_colorear.push(getCasillaObjetoById(element));
+            });
+            HorizontalesFicha(myFichaPrueba).forEach(element => {
+                fichas_a_colorear.push(getCasillaObjetoById(element));
+            });
+            fichas_a_colorear.forEach(element => {
+                casilla_dessombrear(casillas[element]);
+            });
+        }
         //pintarBordeTablero();
     //    identificadoresTablero.forEach(element => {
     //        console.log(element);
@@ -297,14 +396,25 @@ function create ()
         
     
     emitter.startFollow(logo);
-    let myFichaPrueba = new fichaTablero(casillas[36],"blancas",this,casillasBoard[36]);
-    casillasBoard[36].tieneFicha=true;
+    let indexPrueba =23;
+    let myFichaPrueba = new fichaTablero(casillas[indexPrueba],"blancas",this,casillasBoard[indexPrueba]);
     myFichaPrueba.fichaCanvas.on('pointerup', function() {
 
        console.log(myFichaPrueba);
+       casillas_sombrear_direcciones(myFichaPrueba);
          });
-    
+    // myFichaPrueba.fichaCanvas.on('pointerout', function() {
+
+    //     casillas_dessombrear_direcciones(myFichaPrueba);
+    //     });
+    myFichaPrueba.fichaCanvas.on('pointerdown', function() {
+
+        casillas_dessombrear_direcciones(myFichaPrueba);
+        });
+    //DiagonalDescendenteFicha(myFichaPrueba);
+    DiagonalAscendenteFicha(myFichaPrueba);
     //tablero();
-    verticalesFicha(myFichaPrueba);
-    HorizontalesFicha(myFichaPrueba);
+
+    
+    
 }
