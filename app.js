@@ -22,18 +22,28 @@ class CasillaTablero {
         this.id=id;
         this.idTablero=idTablero;
         this.CasillaLimite=false;
-        this.casillaCanvas=this.casillaCanvas;
+        this.casillaCanvas;
     }
+    setCasillaCanvas(casilla){
+        this.casillaCanvas=casilla;
+    }
+
   }
   class fichaTablero {
     constructor(casilla,jugador,gameScene,casillaObjeto) {
+        
         casillaObjeto.tieneFicha=true;
         this.casillaObjeto=casillaObjeto;
         this.casilla=casilla;
         this.jugador=jugador;
         this.fichaPosX=casillaObjeto.posX;
         this.fichaPosY=casillaObjeto.posY;
-        this.fichaCanvas=gameScene.add.circle(casillaObjeto.posX, casillaObjeto.posY, 40, colorFichasPruebas).setInteractive();
+        if (jugador=="blancas") {
+            this.fichaCanvas=gameScene.add.circle(casillaObjeto.posX, casillaObjeto.posY, 40, colorFichasBlancas).setInteractive();
+        }
+        else{
+            this.fichaCanvas=gameScene.add.circle(casillaObjeto.posX, casillaObjeto.posY, 40, colorFichasNegras).setInteractive();
+        }
         this.fichaCanvas.on('pointerdown', function() {
 
             casilla.setInteractive();
@@ -48,6 +58,7 @@ class CasillaTablero {
                  });
     }
     get movimientos(){
+        let DiagonalAscendente=[];
         let casillasMovimientos =[];
         let casillasMovimientosObject=[];
     }
@@ -107,7 +118,7 @@ function create ()
     logo.setVelocity(100, 200);
     logo.setBounce(1, 1);
     logo.setCollideWorldBounds(true);
-
+        let gameScene =this;
         let fichaLimite=false;
         let coordenadaX=100;
         let coordenadaY=100;
@@ -152,8 +163,10 @@ function create ()
              }
             
         }
-        
-        //let casillaPrueba= new CasillaTablero(0,0,0,false,0,this.add.rectangle(0,0,40,40,0xefc53f));
+        for (let i = 0; i < casillasBoard.length; i++) {
+            casillasBoard[i].setCasillaCanvas(casillas[i]);
+        }
+        //let casillaPrueba= new CasillaTablero(0,0,0,false,0,this.add.rectangle(0,0,40,40,0xefc53f),this);
         
 
 
@@ -166,12 +179,8 @@ function create ()
                 positionY=casillasBoard[index].posY;
 
                 //Añadimos la fichita
-                fichasNegras[i]=escena.add.circle(positionX, positionY, 40, colorFichasNegras).setInteractive();
-                fichasNegras[i].on('pointerdown', function() {
-                console.log('ficha seleccionada');
-                console.log("Has selecionado una fichas Negra");
-
-                 });
+                fichasNegras[i]=new fichaTablero(casillas[index],"negras",escena,casillasBoard[index]);
+                i++;
             }
             //Ultima fila
             for (let index = 1; index < 7; index++) {
@@ -179,12 +188,8 @@ function create ()
                 positionY=casillasBoard[index+56].posY;
 
                 //Añadimos la fichita
-                fichasNegras[i]=escena.add.circle(positionX, positionY, 40, colorFichasNegras).setInteractive();
-                fichasNegras[i].on('pointerdown', function() {
-                console.log('ficha seleccionada');
-                console.log("Has selecionado una fichas Negra");
-
-                 });
+                fichasNegras[i]=new fichaTablero(casillas[index+56],"negras",escena,casillasBoard[index+56]);;
+                i++;
             }
         }
         function actualizarFichasLimites(){
@@ -204,30 +209,23 @@ function create ()
         function colocarFichasBlancas(){
             var positionX;
             var positionY;
+            let i=0;
             //Primera fila
             for (let index = 1; index < 7; index++) {
                 positionX=casillasBoard[index*8].posX;
                 positionY=casillasBoard[index*8].posY;
 
                 //Añadimos la fichita
-                fichasBlancas[i]=escena.add.circle(positionX, positionY, 40, colorFichasBlancas).setInteractive();
-                fichasBlancas[i].on('pointerdown', function() {
-                console.log('ficha seleccionada');
-                console.log("Has selecionado una fichas Blanca");
-
-                 });
+                fichasBlancas[i]=new fichaTablero(casillas[index*8],"blancas",escena,casillasBoard[index*8]);
+                 i++;
             }
             for (let index = 1; index < 7; index++) {
                 positionX=casillasBoard[(index+1)*8-1].posX;
                 positionY=casillasBoard[(index+1)*8-1].posY;
                 
                 //Añadimos la fichita
-                fichasBlancas[i]=escena.add.circle(positionX, positionY, 40, colorFichasBlancas).setInteractive();
-                fichasBlancas[i].on('pointerdown', function() {
-                console.log('ficha seleccionada');
-                console.log("Has selecionado una fichas Blanca");
-
-                 });
+                fichasBlancas[i]=new fichaTablero(casillas[(index+1)*8-1],"blancas",escena,casillasBoard[(index+1)*8-1]);;
+                 i++;
             }
             //Ultima fila
             
@@ -264,7 +262,7 @@ function create ()
             for (let i = 1;  idFichaFila+i<=8; i++) {
                 casillasVerticales.push((idFichaFila+i)+idFichaColumna);                
              }
-            console.log(casillasVerticales)
+            //console.log(casillasVerticales)
             return casillasVerticales;
         }
         function HorizontalesFicha(fichita){
@@ -275,19 +273,68 @@ function create ()
             let idFichaColumna=casillaActual.idTablero.split("")[1];
             let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
 
-            console.log(indexLetrasCasilla);
+
 
             //Primero las de abajo;
             for (let i = 1;  indexLetrasCasilla-i>=0; i++) {
-                console.log(letrasTablero[indexLetrasCasilla-i]);
                 casillasHorizontales.push((idFichaFila)+letrasTablero[indexLetrasCasilla-i]);                
              }
              for (let i = 1;  indexLetrasCasilla+i<=7; i++) {
-                console.log(letrasTablero[indexLetrasCasilla+i]);
                 casillasHorizontales.push((idFichaFila)+letrasTablero[indexLetrasCasilla+i]);                
              }
-            console.log(casillasHorizontales)
             return casillasHorizontales;
+        }
+        function HorizontalesFicha_ObjetoCasillas(ficha){
+            let casillasHorizontales=HorizontalesFicha(ficha);
+            let casillasHorizontalesIndices=[];
+            let casillasHorizontalesObjeto=[];
+            casillasHorizontales.forEach(element => {
+                casillasHorizontalesIndices.push(getCasillaObjetoById(element));
+            });
+            casillasHorizontalesIndices.forEach(element =>{
+                casillasHorizontalesObjeto.push(casillasBoard[element]);
+            });
+            casillasHorizontalesObjeto.push();
+            return casillasHorizontalesObjeto;
+        }
+        function VerticalesFicha_ObjetoCasillas(ficha){
+            let casillasVerticales=verticalesFicha(ficha);
+            let casillasVerticalesIndices=[];
+            let casillasVerticalesObjeto=[];
+            casillasVerticales.forEach(element => {
+                casillasVerticalesIndices.push(getCasillaObjetoById(element));
+            });
+            casillasVerticalesIndices.forEach(element =>{
+                casillasVerticalesObjeto.push(casillasBoard[element]);
+            });
+            casillasVerticalesObjeto.push();
+            return casillasVerticalesObjeto;
+        }
+        function DiagonalesDescenteFicha_ObjetoCasillas(ficha){
+            let casillasDiagonalesDescente=DiagonalDescendenteFicha(ficha);
+            let casillasDiagonalesDescenteIndices=[];
+            let casillasDiagonalesDescenteObjeto=[];
+            casillasDiagonalesDescente.forEach(element => {
+                casillasDiagonalesDescenteIndices.push(getCasillaObjetoById(element));
+            });
+            casillasDiagonalesDescenteIndices.forEach(element =>{
+                casillasDiagonalesDescenteObjeto.push(casillasBoard[element]);
+            });
+            casillasDiagonalesDescenteObjeto.push();
+            return casillasDiagonalesDescenteObjeto;
+        }
+        function DiagonalesAscendenteFicha_ObjetoCasillas(ficha){
+            let casillasDiagonalesAscendente=DiagonalAscendenteFicha(ficha);
+            let casillasDiagonalesAscendenteIndices=[];
+            let casillasDiagonalesAscendenteObjeto=[];
+            casillasDiagonalesAscendente.forEach(element => {
+                casillasDiagonalesAscendenteIndices.push(getCasillaObjetoById(element));
+            });
+            casillasDiagonalesAscendenteIndices.forEach(element =>{
+                casillasDiagonalesAscendenteObjeto.push(casillasBoard[element]);
+            });
+            casillasDiagonalesAscendenteObjeto.push();
+            return casillasDiagonalesAscendenteObjeto;
         }
         function DiagonalDescendenteFicha(fichita){
             const letrasTablero=["a","b","c","d","e","f","g","h"];
@@ -297,7 +344,7 @@ function create ()
             let idFichaColumna=casillaActual.idTablero.split("")[1];
             let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
 
-            console.log(indexLetrasCasilla);
+
 
             //Primero las de abajo;
             for (let i = 1;  indexLetrasCasilla-i>=0 && idFichaFila+i<=8; i++) {
@@ -306,7 +353,7 @@ function create ()
              for (let i = 1;  indexLetrasCasilla+i<=7 && idFichaFila-i>=1; i++) {
                 casillasDiagonales.push((idFichaFila-i)+letrasTablero[indexLetrasCasilla+i]);                
              }
-            console.log(casillasDiagonales)
+            //console.log(casillasDiagonales)
             return casillasDiagonales;
         }
         function DiagonalAscendenteFicha(fichita){
@@ -317,7 +364,7 @@ function create ()
             let idFichaColumna=casillaActual.idTablero.split("")[1];
             let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
 
-            console.log(indexLetrasCasilla);
+            //console.log(indexLetrasCasilla);
 
             //Primero las de abajo;
             for (let i = 1;  indexLetrasCasilla+i<=7 && idFichaFila+i<=8; i++) {
@@ -326,7 +373,7 @@ function create ()
              for (let i = 1;  indexLetrasCasilla-i>=0 && idFichaFila-i>=1; i++) {
                 casillasDiagonales.push((idFichaFila-i)+letrasTablero[indexLetrasCasilla-i]);                
              }
-            console.log(casillasDiagonales)
+            //console.log(casillasDiagonales)
             return casillasDiagonales;
         }
        function  casilla_sombrear(casilla_sombrear){
@@ -378,6 +425,46 @@ function create ()
                 casilla_dessombrear(casillas[element]);
             });
         }
+        function calcularMovesHorizontales(Ficha){
+            let fichasHorizontales =HorizontalesFicha_ObjetoCasillas(Ficha);
+            let movesHorizontales =1;
+            fichasHorizontales.forEach(element => {
+                if(element.tieneFicha){
+                    movesHorizontales++;
+                }
+            });
+            return movesHorizontales;            
+        }
+        function calcularMovesVerticales(Ficha){
+            let fichasVerticales =VerticalesFicha_ObjetoCasillas(Ficha);
+            let movesVerticales =1;
+            fichasVerticales.forEach(element => {
+                if(element.tieneFicha){
+                    movesVerticales++;
+                }
+            });
+            return movesVerticales;            
+        }
+        function calcularMovesDiagonalesDescente(Ficha){
+            let fichasDiagonalesDescente =DiagonalesDescenteFicha_ObjetoCasillas(Ficha);
+            let movesDiagonalesDescente =1;
+            fichasDiagonalesDescente.forEach(element => {
+                if(element.tieneFicha){
+                    movesDiagonalesDescente++;
+                }
+            });
+            return movesDiagonalesDescente;            
+        }
+        function calcularMovesDiagonalesAscendente(Ficha){
+            let fichasDiagonalesAscendente =DiagonalesAscendenteFicha_ObjetoCasillas(Ficha);
+            let movesDiagonalesAscendente =1;
+            fichasDiagonalesAscendente.forEach(element => {
+                if(element.tieneFicha){
+                    movesDiagonalesAscendente++;
+                }
+            });
+            return movesDiagonalesAscendente;            
+        }
         //pintarBordeTablero();
     //    identificadoresTablero.forEach(element => {
     //        console.log(element);
@@ -396,25 +483,16 @@ function create ()
         
     
     emitter.startFollow(logo);
-    let indexPrueba =23;
+    let indexPrueba =54;
     let myFichaPrueba = new fichaTablero(casillas[indexPrueba],"blancas",this,casillasBoard[indexPrueba]);
     myFichaPrueba.fichaCanvas.on('pointerup', function() {
-
+       
        console.log(myFichaPrueba);
-       casillas_sombrear_direcciones(myFichaPrueba);
+       console.log("Horizontal moves: "+calcularMovesHorizontales(myFichaPrueba));
+       console.log("Vertical moves: "+calcularMovesVerticales(myFichaPrueba));
+       console.log("Diagonal Ascendente moves: "+calcularMovesDiagonalesAscendente(myFichaPrueba));
+       console.log("Diagonal Descendente moves: "+calcularMovesDiagonalesDescente(myFichaPrueba));
+       //casillas_sombrear_direcciones(myFichaPrueba);
          });
-    // myFichaPrueba.fichaCanvas.on('pointerout', function() {
-
-    //     casillas_dessombrear_direcciones(myFichaPrueba);
-    //     });
-    myFichaPrueba.fichaCanvas.on('pointerdown', function() {
-
-        casillas_dessombrear_direcciones(myFichaPrueba);
-        });
-    //DiagonalDescendenteFicha(myFichaPrueba);
-    DiagonalAscendenteFicha(myFichaPrueba);
-    //tablero();
-
-    
     
 }
