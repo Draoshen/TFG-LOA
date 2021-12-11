@@ -45,6 +45,7 @@ class CasillaTablero {
         this.movesH;
         this.movesD_A;
         this.movesD_D;
+        let Ficha=this;
         if (jugador=="blancas") {
             this.fichaCanvas=gameScene.add.circle(casillaObjeto.posX, casillaObjeto.posY, 40, colorFichasBlancas).setInteractive();
         }
@@ -55,6 +56,7 @@ class CasillaTablero {
 
             casilla.setInteractive();
             casilla.setStrokeStyle(4,0xE6EF2D);
+            //console.log(Ficha);
              });
         
          this.fichaCanvas.on('pointerup', function() {
@@ -179,6 +181,14 @@ function create ()
         }
         for (let i = 0; i < casillasBoard.length; i++) {
             casillasBoard[i].setCasillaCanvas(casillas[i]);
+        }
+        const letrasTablero=["a","b","c","d","e","f","g","h"];
+        let map1 = new Map();
+        for (let i = 0; i < numFilas; i++) {
+            for (let j = 0; j < numColumnas; j++) {
+                map1.set(8-i+letrasTablero[j],(i*8)+j)
+            }
+            
         }
         //let casillaPrueba= new CasillaTablero(0,0,0,false,0,this.add.rectangle(0,0,40,40,0xefc53f),this);
         
@@ -459,7 +469,7 @@ function create ()
             });
             return Ficha.movesV=movesVerticales;            
         }
-        function calcularMovesDiagonalesDescente(Ficha){
+        function calcularMovesDiagonalesDescendente(Ficha){
             let fichasDiagonalesDescente =DiagonalesDescenteFicha_ObjetoCasillas(Ficha);
             let movesDiagonalesDescente =1;
             fichasDiagonalesDescente.forEach(element => {
@@ -496,13 +506,11 @@ function create ()
                     }                   
                     
                 }
-                console.log(casillasBoard[getCasillaObjetoById(idFichaFila+letrasTablero[movesHorizontales+indexLetrasCasilla])].tieneFicha==Ficha.jugador);
                 if (casillasBoard[getCasillaObjetoById(idFichaFila+letrasTablero[movesHorizontales+indexLetrasCasilla])].tieneFicha==Ficha.jugador) {
                     sePuedeMover=false;
                     
                 }
                 if (sePuedeMover) {
-                    console.log("no deberías de entrar");
                     casillasToMove.push(idFichaFila+letrasTablero[movesHorizontales+indexLetrasCasilla]);
                 }
             }
@@ -523,6 +531,142 @@ function create ()
                     casillasToMove.push(idFichaFila+letrasTablero[indexLetrasCasilla-movesHorizontales]);
                 }
             }
+            
+            return casillasToMove;
+        }
+        function moveVertical(Ficha){
+            const letrasTablero=["a","b","c","d","e","f","g","h"];
+            let casillasToMove=[];
+            let casillaActual = Ficha.casillaObjeto;
+            let idFichaFila=parseInt(casillaActual.idTablero.split("")[0]);
+            let idFichaColumna=casillaActual.idTablero.split("")[1];
+            let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
+            let movesVerticales=calcularMovesVerticales(myFichaPrueba);
+            let sePuedeMover=true;
+            let colorContrario=oppositeColor(Ficha);
+            if(movesVerticales+idFichaFila<=8){
+                for (let i = 1; i < movesVerticales && sePuedeMover; i++) {
+                    if(casillasBoard[getCasillaObjetoById((idFichaFila+i)+idFichaColumna)].tieneFicha==colorContrario){
+                        sePuedeMover=false;
+                    }                   
+                    
+                }
+                if (casillasBoard[getCasillaObjetoById((idFichaFila+movesVerticales)+idFichaColumna)].tieneFicha==Ficha.jugador) {
+                    sePuedeMover=false;
+                    
+                }
+                if (sePuedeMover) {
+                    casillasToMove.push((idFichaFila+movesVerticales)+idFichaColumna);
+                }
+            }
+            //Second part
+            sePuedeMover=true;
+            if(idFichaFila-movesVerticales>0){
+                for (let i = 1; i < movesVerticales && sePuedeMover; i++) {
+                    if(casillasBoard[getCasillaObjetoById((idFichaFila-i)+idFichaColumna)].tieneFicha==colorContrario){
+                        sePuedeMover=false;
+                    }                   
+                    
+                }
+                
+                if (casillasBoard[getCasillaObjetoById((idFichaFila-movesVerticales)+idFichaColumna)].tieneFicha==Ficha.jugador) {
+                    sePuedeMover=false;
+                }
+                if (sePuedeMover) {
+                    casillasToMove.push((idFichaFila-movesVerticales)+idFichaColumna);
+                }
+            }
+            
+            return casillasToMove;
+        }
+        function moveDiagonalAscendente(Ficha){
+            const letrasTablero=["a","b","c","d","e","f","g","h"];
+            let casillasToMove=[];
+            let casillaActual = Ficha.casillaObjeto;
+            let idFichaFila=parseInt(casillaActual.idTablero.split("")[0]);
+            let idFichaColumna=casillaActual.idTablero.split("")[1];
+            let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
+            let movesDiagonalesAscendente=calcularMovesDiagonalesAscendente(myFichaPrueba);
+            let sePuedeMover=true;
+            let colorContrario=oppositeColor(Ficha);
+            if(indexLetrasCasilla+movesDiagonalesAscendente<=7 && idFichaFila+movesDiagonalesAscendente<=8){
+                for (let i = 1; i < movesDiagonalesAscendente && sePuedeMover; i++) {
+                    if(casillasBoard[getCasillaObjetoById((idFichaFila+i)+letrasTablero[i+indexLetrasCasilla])].tieneFicha==colorContrario){
+                        sePuedeMover=false;
+                    }                   
+                    
+                }
+                if (casillasBoard[getCasillaObjetoById((idFichaFila+movesDiagonalesAscendente)+letrasTablero[indexLetrasCasilla+movesDiagonalesAscendente])].tieneFicha==Ficha.jugador) {
+                    sePuedeMover=false;
+                    
+                }
+                if (sePuedeMover) {
+                    casillasToMove.push((idFichaFila+movesDiagonalesAscendente)+letrasTablero[indexLetrasCasilla+movesDiagonalesAscendente]);
+                }
+            }
+            //Second part
+            sePuedeMover=true;
+            if(indexLetrasCasilla-movesDiagonalesAscendente>=0 && idFichaFila-movesDiagonalesAscendente>0){
+                for (let i = 1; i < movesDiagonalesAscendente && sePuedeMover; i++) {
+                    if(casillasBoard[getCasillaObjetoById((idFichaFila-i)+letrasTablero[indexLetrasCasilla-i])].tieneFicha==colorContrario){
+                        sePuedeMover=false;
+                    }                   
+                    
+                }
+                if (casillasBoard[getCasillaObjetoById((idFichaFila-movesDiagonalesAscendente)+letrasTablero[indexLetrasCasilla-movesDiagonalesAscendente])].tieneFicha==Ficha.jugador) {
+                    sePuedeMover=false;
+                    
+                }
+                if (sePuedeMover) {
+                    casillasToMove.push((idFichaFila-movesDiagonalesAscendente)+letrasTablero[indexLetrasCasilla-movesDiagonalesAscendente]);
+                }
+            }
+            
+            return casillasToMove;
+        }
+        function moveDiagonalDescendente(Ficha){
+            const letrasTablero=["a","b","c","d","e","f","g","h"];
+            let casillasToMove=[];
+            let casillaActual = Ficha.casillaObjeto;
+            let idFichaFila=parseInt(casillaActual.idTablero.split("")[0]);
+            let idFichaColumna=casillaActual.idTablero.split("")[1];
+            let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
+            let movesDiagonalesDescendente=calcularMovesDiagonalesDescendente(myFichaPrueba);
+            let sePuedeMover=true;
+            let colorContrario=oppositeColor(Ficha);
+            if(indexLetrasCasilla-movesDiagonalesDescendente>=0 && idFichaFila+movesDiagonalesDescendente<=8){
+                for (let i = 1; i < movesDiagonalesDescendente && sePuedeMover; i++) {
+                    if(casillasBoard[getCasillaObjetoById((idFichaFila+i)+letrasTablero[indexLetrasCasilla-1])].tieneFicha==colorContrario){
+                        sePuedeMover=false;
+                    }                   
+                    
+                }
+                if (casillasBoard[getCasillaObjetoById((idFichaFila+movesDiagonalesDescendente)+letrasTablero[indexLetrasCasilla-movesDiagonalesDescendente])].tieneFicha==Ficha.jugador) {
+                    sePuedeMover=false;
+                    
+                }
+                if (sePuedeMover) {
+                    casillasToMove.push((idFichaFila+movesDiagonalesDescendente)+letrasTablero[indexLetrasCasilla-movesDiagonalesDescendente]);
+                }
+            }
+            //Second part
+            sePuedeMover=true;
+            if(indexLetrasCasilla+movesDiagonalesDescendente<=7 && idFichaFila-movesDiagonalesDescendente>0){
+                for (let i = 1; i < movesDiagonalesDescendente && sePuedeMover; i++) {
+                    if(casillasBoard[getCasillaObjetoById((idFichaFila-i)+letrasTablero[indexLetrasCasilla+i])].tieneFicha==colorContrario){
+                        sePuedeMover=false;
+                    }                   
+                    
+                }
+                if (casillasBoard[getCasillaObjetoById((idFichaFila-movesDiagonalesDescendente)+letrasTablero[indexLetrasCasilla+movesDiagonalesDescendente])].tieneFicha==Ficha.jugador) {
+                    sePuedeMover=false;
+                    
+                }
+                if (sePuedeMover) {
+                    casillasToMove.push((idFichaFila-movesDiagonalesDescendente)+letrasTablero[indexLetrasCasilla+movesDiagonalesDescendente]);
+                }
+            }
+            
             return casillasToMove;
         }
         function oppositeColor(Ficha){
@@ -533,6 +677,27 @@ function create ()
             if(Ficha.jugador=="negras"){
                 return colorContrario="blancas"
             }
+        }
+        function moveFicha(Ficha){
+            let movesFicha=[];
+            moveHorizontal(myFichaPrueba).forEach(element => {
+                movesFicha.push(element);
+            });
+            moveVertical(myFichaPrueba).forEach(element => {
+                movesFicha.push(element);
+            });
+            moveDiagonalAscendente(myFichaPrueba).forEach(element => {
+                movesFicha.push(element);
+            });
+            moveDiagonalDescendente(myFichaPrueba).forEach(element => {
+                movesFicha.push(element);
+            });
+
+            return movesFicha;
+
+        }
+        function traductor(){
+            console.log(map1.get(33));
         }
         //pintarBordeTablero();
     //    identificadoresTablero.forEach(element => {
@@ -552,8 +717,12 @@ function create ()
         
     
     emitter.startFollow(logo);
-    let indexPrueba =52;
-    let myFichaPrueba = new fichaTablero(casillas[indexPrueba],"blancas",this,casillasBoard[indexPrueba]);
+    let indexPrueba =map1.get("4e");
+    let posiblesMoves=[];
+    let indexMoves=0;
+    let activated=false;
+    let myFichaPrueba = new fichaTablero(casillas[indexPrueba],"negras",this,casillasBoard[indexPrueba]);
+    let myFichaPrueba2;
     //let myFichaPrueba1 = new fichaTablero(casillas[indexPrueba+2],"blancas",this,casillasBoard[indexPrueba+2]);
     myFichaPrueba.fichaCanvas.on('pointerup', function() {
        
@@ -561,11 +730,23 @@ function create ()
        console.log("Horizontal moves: "+calcularMovesHorizontales(myFichaPrueba));
        console.log("Vertical moves: "+calcularMovesVerticales(myFichaPrueba));
        console.log("Diagonal Ascendente moves: "+calcularMovesDiagonalesAscendente(myFichaPrueba));
-       console.log("Diagonal Descendente moves: "+calcularMovesDiagonalesDescente(myFichaPrueba));
-       console.log(moveHorizontal(myFichaPrueba));
+       console.log("Diagonal Descendente moves: "+calcularMovesDiagonalesDescendente(myFichaPrueba));
+       console.log(moveFicha(myFichaPrueba));
        
+        moveFicha(myFichaPrueba).forEach(element => {
+           
+            let casillaPintar=casillasBoard[map1.get(element)];
+            posiblesMoves[indexMoves]=gameScene.add.rectangle(casillaPintar.posX,casillaPintar.posY,ladoCasilla,ladoCasilla);
+            posiblesMoves[indexMoves].setStrokeStyle(4, 0x9172AC);
+
+            indexMoves++;
+           });
+           
+
+       //console.log(moveDiagonalDescendente(myFichaPrueba));
+
+       //casilla_sombrear(casillas[getCasillaObjetoById(moveHorizontal(myFichaPrueba))]);
        //casillas_sombrear_direcciones(myFichaPrueba);
          });
-         console.log(casillasBoard[21]);
     
 }
