@@ -56,6 +56,12 @@ class CasillaTablero {
 
             casilla.setInteractive();
             casilla.setStrokeStyle(4,0xE6EF2D);
+            console.log(Ficha);
+            console.log("Horizontal moves: "+calcularMovesHorizontales(Ficha));
+            console.log("Vertical moves: "+calcularMovesVerticales(Ficha));
+            console.log("Diagonal Ascendente moves: "+calcularMovesDiagonalesAscendente(Ficha));
+            console.log("Diagonal Descendente moves: "+calcularMovesDiagonalesDescendente(Ficha));
+            console.log(moveFicha(Ficha));
             //console.log(Ficha);
              });
         
@@ -109,7 +115,57 @@ function preload ()
 
 function create ()
 {   
+    class fichaTablero {
+        constructor(casilla,jugador,gameScene,casillaObjeto) {
+            
+            casillaObjeto.tieneFicha=jugador;
+            this.casillaObjeto=casillaObjeto;
+            this.casilla=casilla;
+            this.jugador=jugador;
+            this.fichaPosX=casillaObjeto.posX;
+            this.fichaPosY=casillaObjeto.posY;
+            this.movesV;
+            this.movesH;
+            this.movesD_A;
+            this.movesD_D;
+            let Ficha=this;
+            let posiblesMoves=[];
+            let indexMoves=0;
+            if (jugador=="blancas") {
+                this.fichaCanvas=gameScene.add.circle(casillaObjeto.posX, casillaObjeto.posY, 40, colorFichasBlancas).setInteractive();
+            }
+            else{
+                this.fichaCanvas=gameScene.add.circle(casillaObjeto.posX, casillaObjeto.posY, 40, colorFichasNegras).setInteractive();
+            }
+            this.fichaCanvas.on('pointerdown', function() {
 
+                console.log("No me toques el código porfa");
+                casilla.setInteractive();
+                casilla.setStrokeStyle(4,0xE6EF2D);
+                console.log(Ficha);
+                console.log("Horizontal moves: "+calcularMovesHorizontales(Ficha));
+                console.log("Vertical moves: "+calcularMovesVerticales(Ficha));
+                console.log("Diagonal Ascendente moves: "+calcularMovesDiagonalesAscendente(Ficha));
+                console.log("Diagonal Descendente moves: "+calcularMovesDiagonalesDescendente(Ficha));
+                console.log(moveFicha(Ficha));
+                //console.log(Ficha);
+                 });
+
+            
+             this.fichaCanvas.on('pointerup', function() {
+    
+                    casilla.setInteractive();
+                    casilla.setStrokeStyle(0,0x000000);
+                    //console.log();
+                     });
+        }
+        get movimientos(){
+            let DiagonalAscendente=[];
+            let casillasMovimientos =[];
+            let casillasMovimientosObject=[];
+        }
+        
+      }
 
     let escena=this; 
    //this.add.image(400, 300, 'sky');
@@ -418,16 +474,16 @@ function create ()
         function casillas_sombrear_direcciones(Ficha){
             let fichas_a_colorear=[];
             let fichas_a_colorearDiagonal=[];
-            verticalesFicha(myFichaPrueba).forEach(element => {
+            verticalesFicha(Ficha).forEach(element => {
                 fichas_a_colorear.push(getCasillaObjetoById(element));
             });
-            HorizontalesFicha(myFichaPrueba).forEach(element => {
+            HorizontalesFicha(Ficha).forEach(element => {
                 fichas_a_colorear.push(getCasillaObjetoById(element));
             });
-            DiagonalDescendenteFicha(myFichaPrueba).forEach(element => {
+            DiagonalDescendenteFicha(Ficha).forEach(element => {
                 fichas_a_colorearDiagonal.push(getCasillaObjetoById(element));
             });
-            DiagonalAscendenteFicha(myFichaPrueba).forEach(element => {
+            DiagonalAscendenteFicha(Ficha).forEach(element => {
                 fichas_a_colorearDiagonal.push(getCasillaObjetoById(element));
             });
             fichas_a_colorear.forEach(element => {
@@ -439,10 +495,10 @@ function create ()
         }
         function casillas_dessombrear_direcciones(Ficha){
             let fichas_a_colorear=[];
-            verticalesFicha(myFichaPrueba).forEach(element => {
+            verticalesFicha(Ficha).forEach(element => {
                 fichas_a_colorear.push(getCasillaObjetoById(element));
             });
-            HorizontalesFicha(myFichaPrueba).forEach(element => {
+            HorizontalesFicha(Ficha).forEach(element => {
                 fichas_a_colorear.push(getCasillaObjetoById(element));
             });
             fichas_a_colorear.forEach(element => {
@@ -496,7 +552,7 @@ function create ()
             let idFichaFila=parseInt(casillaActual.idTablero.split("")[0]);
             let idFichaColumna=casillaActual.idTablero.split("")[1];
             let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
-            let movesHorizontales=calcularMovesHorizontales(myFichaPrueba);
+            let movesHorizontales=calcularMovesHorizontales(Ficha);
             let sePuedeMover=true;
             let colorContrario=oppositeColor(Ficha);
             if(movesHorizontales+indexLetrasCasilla<=7){
@@ -541,7 +597,7 @@ function create ()
             let idFichaFila=parseInt(casillaActual.idTablero.split("")[0]);
             let idFichaColumna=casillaActual.idTablero.split("")[1];
             let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
-            let movesVerticales=calcularMovesVerticales(myFichaPrueba);
+            let movesVerticales=calcularMovesVerticales(Ficha);
             let sePuedeMover=true;
             let colorContrario=oppositeColor(Ficha);
             if(movesVerticales+idFichaFila<=8){
@@ -573,6 +629,7 @@ function create ()
                     sePuedeMover=false;
                 }
                 if (sePuedeMover) {
+                    //console.log((movesVerticales));
                     casillasToMove.push((idFichaFila-movesVerticales)+idFichaColumna);
                 }
             }
@@ -586,7 +643,7 @@ function create ()
             let idFichaFila=parseInt(casillaActual.idTablero.split("")[0]);
             let idFichaColumna=casillaActual.idTablero.split("")[1];
             let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
-            let movesDiagonalesAscendente=calcularMovesDiagonalesAscendente(myFichaPrueba);
+            let movesDiagonalesAscendente=calcularMovesDiagonalesAscendente(Ficha);
             let sePuedeMover=true;
             let colorContrario=oppositeColor(Ficha);
             if(indexLetrasCasilla+movesDiagonalesAscendente<=7 && idFichaFila+movesDiagonalesAscendente<=8){
@@ -631,7 +688,7 @@ function create ()
             let idFichaFila=parseInt(casillaActual.idTablero.split("")[0]);
             let idFichaColumna=casillaActual.idTablero.split("")[1];
             let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
-            let movesDiagonalesDescendente=calcularMovesDiagonalesDescendente(myFichaPrueba);
+            let movesDiagonalesDescendente=calcularMovesDiagonalesDescendente(Ficha);
             let sePuedeMover=true;
             let colorContrario=oppositeColor(Ficha);
             if(indexLetrasCasilla-movesDiagonalesDescendente>=0 && idFichaFila+movesDiagonalesDescendente<=8){
@@ -680,16 +737,16 @@ function create ()
         }
         function moveFicha(Ficha){
             let movesFicha=[];
-            moveHorizontal(myFichaPrueba).forEach(element => {
+            moveHorizontal(Ficha).forEach(element => {
                 movesFicha.push(element);
             });
-            moveVertical(myFichaPrueba).forEach(element => {
+            moveVertical(Ficha).forEach(element => {
                 movesFicha.push(element);
             });
-            moveDiagonalAscendente(myFichaPrueba).forEach(element => {
+            moveDiagonalAscendente(Ficha).forEach(element => {
                 movesFicha.push(element);
             });
-            moveDiagonalDescendente(myFichaPrueba).forEach(element => {
+            moveDiagonalDescendente(Ficha).forEach(element => {
                 movesFicha.push(element);
             });
 
@@ -722,23 +779,27 @@ function create ()
     let indexMoves=0;
     let activated=false;
     let myFichaPrueba = new fichaTablero(casillas[indexPrueba],"negras",this,casillasBoard[indexPrueba]);
-    let myFichaPrueba2;
-    //let myFichaPrueba1 = new fichaTablero(casillas[indexPrueba+2],"blancas",this,casillasBoard[indexPrueba+2]);
+
     myFichaPrueba.fichaCanvas.on('pointerup', function() {
        
-       console.log(myFichaPrueba);
-       console.log("Horizontal moves: "+calcularMovesHorizontales(myFichaPrueba));
-       console.log("Vertical moves: "+calcularMovesVerticales(myFichaPrueba));
-       console.log("Diagonal Ascendente moves: "+calcularMovesDiagonalesAscendente(myFichaPrueba));
-       console.log("Diagonal Descendente moves: "+calcularMovesDiagonalesDescendente(myFichaPrueba));
-       console.log(moveFicha(myFichaPrueba));
+
        
         moveFicha(myFichaPrueba).forEach(element => {
            
             let casillaPintar=casillasBoard[map1.get(element)];
             posiblesMoves[indexMoves]=gameScene.add.rectangle(casillaPintar.posX,casillaPintar.posY,ladoCasilla,ladoCasilla);
             posiblesMoves[indexMoves].setStrokeStyle(4, 0x9172AC);
-
+            posiblesMoves[indexMoves].setInteractive().on('pointerup',function(){
+                myFichaPrueba.casillaObjeto.tieneFicha=false;
+                myFichaPrueba.fichaCanvas.destroy();
+                myFichaPrueba = new fichaTablero(casillas[map1.get(element)],"negras",gameScene,casillasBoard[map1.get(element)]);
+                //myFichaPrueba.fichaCanvas=gameScene.add.circle(casillaPintar.posX, casillaPintar.posY, 40, colorFichasNegras).setInteractive();
+                posiblesMoves.forEach(element => {
+                    element.setStrokeStyle(0,0x9172AC);
+                    //gameScene.remove.circle(casillaPintar.posX, casillaPintar.posY, 40, colorFichasBlancas);
+                    //gameScene.destroy(myFichaPrueba.fichaCanvas);
+                });
+            });
             indexMoves++;
            });
            
@@ -748,5 +809,10 @@ function create ()
        //casilla_sombrear(casillas[getCasillaObjetoById(moveHorizontal(myFichaPrueba))]);
        //casillas_sombrear_direcciones(myFichaPrueba);
          });
-    
+       let a = gameScene.add.rectangle(900,900,ladoCasilla,ladoCasilla,0x9172AC).setInteractive();
+       a.on('pointerup',function() {
+           a.destroy();
+           console.log(casillasBoard[indexPrueba]);
+           console.log(casillasBoard[map1.get("5d")]);
+       });
 }
