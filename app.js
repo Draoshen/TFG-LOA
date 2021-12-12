@@ -83,6 +83,8 @@ class CasillaTablero {
 //casillasBoard : CasillaTablero = [64];
 let casillasBoard = [];
 let CasillasLimites=[];
+let casillasHighlighted=[];
+let fichaSeleccionada=null;
 let fichasNegras = [];
 let identificadoresTablero=[];
 const colorFichasNegras = 0x3B292C;
@@ -91,6 +93,7 @@ const colorFichasPruebas= 0x44327E;
 let fichasBlancas=[];
 var game = new Phaser.Game(config);
 const casillas=[];
+let fichaDummy;
 let numFilas=8;
 let numColumnas=8;
 let idTableroCalc="";
@@ -138,7 +141,11 @@ function create ()
                 this.fichaCanvas=gameScene.add.circle(casillaObjeto.posX, casillaObjeto.posY, 40, colorFichasNegras).setInteractive();
             }
             this.fichaCanvas.on('pointerdown', function() {
-
+                if (fichaSeleccionada!=null) {
+                    fichaSeleccionada.setStrokeStyle(0,0x000000);
+                }
+                fichaSeleccionada=Ficha.fichaCanvas;
+                Ficha.fichaCanvas.setStrokeStyle(4,0xE5E228);
                 console.log("No me toques el código porfa");
                 casilla.setInteractive();
                 casilla.setStrokeStyle(4,0xE6EF2D);
@@ -239,6 +246,10 @@ function create ()
             casillasBoard[i].setCasillaCanvas(casillas[i]);
         }
         const letrasTablero=["a","b","c","d","e","f","g","h"];
+        let mapColors = new Map();
+        let mapCasillasHighlighted= new Map();
+        mapColors.set("blancas",colorFichasBlancas);
+        mapColors.set("negras",colorFichasNegras);
         let map1 = new Map();
         for (let i = 0; i < numFilas; i++) {
             for (let j = 0; j < numColumnas; j++) {
@@ -749,12 +760,51 @@ function create ()
             moveDiagonalDescendente(Ficha).forEach(element => {
                 movesFicha.push(element);
             });
-
+            let indexMoves=0;
+            casillasHighlighted.forEach(element =>{
+                element.destroy();
+            });
+            movesFicha.forEach(element => {
+                let jugador = Ficha.jugador;
+                let casillaPintar=casillasBoard[map1.get(element)];
+                casillasHighlighted[indexMoves]=gameScene.add.rectangle(casillaPintar.posX,casillaPintar.posY,ladoCasilla,ladoCasilla);
+                mapCasillasHighlighted.set(casillasHighlighted[indexMoves],casillaPintar.id);
+                casillasHighlighted[indexMoves].setStrokeStyle(4, 0x9172AC);
+                casillasHighlighted[indexMoves].setInteractive().on('pointerup',function(){
+                    console.log("You are already dead");
+                    if (Ficha!=null) {
+                        Ficha.fichaCanvas.destroy();
+                        Ficha.casillaObjeto.tieneFicha=false;
+                        Ficha.casilla=null;
+                        Ficha=null;
+                    }
+                    Ficha=new fichaTablero(casillas[mapCasillasHighlighted.get(this)],jugador,gameScene,casillasBoard[mapCasillasHighlighted.get(this)]);
+                    fichaSeleccionada.setStrokeStyle(0,0x000000);
+                    console.log(mapCasillasHighlighted.get(this));
+                    casillasHighlighted.forEach(element =>{
+                        element.destroy();
+                    });
+                });
+                // posiblesMoves[indexMoves].setInteractive().on('pointerup',function(){
+                //     Ficha.casillaObjeto.tieneFicha=false;
+                //     Ficha.fichaCanvas.destroy();
+                //     Ficha.fichaCanvas=gameScene.add.circle(casillaPintar.posX, casillaPintar.posY, 40, colorFichasNegras).setInteractive();
+                //     Ficha = new fichaTablero(casillas[map1.get(element)],"negras",gameScene,casillasBoard[map1.get(element)]);
+                //     //myFichaPrueba.fichaCanvas=gameScene.add.circle(casillaPintar.posX, casillaPintar.posY, 40, colorFichasNegras).setInteractive();
+                //     posiblesMoves.forEach(element => {
+                //         element.setStrokeStyle(0,0x9172AC);
+                //         //gameScene.remove.circle(casillaPintar.posX, casillaPintar.posY, 40, colorFichasBlancas);
+                //         //gameScene.destroy(myFichaPrueba.fichaCanvas);
+                //     });
+                // });
+                indexMoves++;
+               });
             return movesFicha;
 
         }
-        function traductor(){
-            console.log(map1.get(33));
+        function movilityFicha(Ficha){
+            Ficha.fichaCanvas.setInteractive();
+
         }
         //pintarBordeTablero();
     //    identificadoresTablero.forEach(element => {
@@ -778,40 +828,40 @@ function create ()
     let posiblesMoves=[];
     let indexMoves=0;
     let activated=false;
-    let myFichaPrueba = new fichaTablero(casillas[indexPrueba],"negras",this,casillasBoard[indexPrueba]);
-
-    myFichaPrueba.fichaCanvas.on('pointerup', function() {
+    // let myFichaPrueba = new fichaTablero(casillas[indexPrueba],"negras",this,casillasBoard[indexPrueba]);
+    // myFichaPrueba.fichaCanvas.on('pointerup', function() {
        
 
        
-        moveFicha(myFichaPrueba).forEach(element => {
+    //     moveFicha(myFichaPrueba).forEach(element => {
            
-            let casillaPintar=casillasBoard[map1.get(element)];
-            posiblesMoves[indexMoves]=gameScene.add.rectangle(casillaPintar.posX,casillaPintar.posY,ladoCasilla,ladoCasilla);
-            posiblesMoves[indexMoves].setStrokeStyle(4, 0x9172AC);
-            posiblesMoves[indexMoves].setInteractive().on('pointerup',function(){
-                myFichaPrueba.casillaObjeto.tieneFicha=false;
-                myFichaPrueba.fichaCanvas.destroy();
-                myFichaPrueba = new fichaTablero(casillas[map1.get(element)],"negras",gameScene,casillasBoard[map1.get(element)]);
-                //myFichaPrueba.fichaCanvas=gameScene.add.circle(casillaPintar.posX, casillaPintar.posY, 40, colorFichasNegras).setInteractive();
-                posiblesMoves.forEach(element => {
-                    element.setStrokeStyle(0,0x9172AC);
-                    //gameScene.remove.circle(casillaPintar.posX, casillaPintar.posY, 40, colorFichasBlancas);
-                    //gameScene.destroy(myFichaPrueba.fichaCanvas);
-                });
-            });
-            indexMoves++;
-           });
+    //         let casillaPintar=casillasBoard[map1.get(element)];
+    //         casillasHighlighted[indexMoves]=gameScene.add.rectangle(casillaPintar.posX,casillaPintar.posY,ladoCasilla,ladoCasilla);
+    //         casillasHighlighted[indexMoves].setStrokeStyle(4, 0x9172AC);
+    //         casillasHighlighted[indexMoves].setInteractive().on('pointerup',function(){
+    //             myFichaPrueba.casillaObjeto.tieneFicha=false;
+    //             myFichaPrueba.fichaCanvas.destroy();
+    //             myFichaPrueba.fichaCanvas=gameScene.add.circle(casillaPintar.posX, casillaPintar.posY, 40, colorFichasNegras).setInteractive();
+    //             myFichaPrueba = new fichaTablero(casillas[map1.get(element)],"negras",gameScene,casillasBoard[map1.get(element)]);
+    //             //myFichaPrueba.fichaCanvas=gameScene.add.circle(casillaPintar.posX, casillaPintar.posY, 40, colorFichasNegras).setInteractive();
+    //             console.log("Die, die");
+
+    //         });
+    //         indexMoves++;
+    //        });
            
 
-       //console.log(moveDiagonalDescendente(myFichaPrueba));
+    //    //console.log(moveDiagonalDescendente(myFichaPrueba));
 
-       //casilla_sombrear(casillas[getCasillaObjetoById(moveHorizontal(myFichaPrueba))]);
-       //casillas_sombrear_direcciones(myFichaPrueba);
-         });
+    //    //casilla_sombrear(casillas[getCasillaObjetoById(moveHorizontal(myFichaPrueba))]);
+    //    //casillas_sombrear_direcciones(myFichaPrueba);
+    //      });
        let a = gameScene.add.rectangle(900,900,ladoCasilla,ladoCasilla,0x9172AC).setInteractive();
        a.on('pointerup',function() {
-           a.destroy();
+           //a.destroy();
+           casillasHighlighted.forEach(element =>{
+               element.destroy();
+           });
            console.log(casillasBoard[indexPrueba]);
            console.log(casillasBoard[map1.get("5d")]);
        });
