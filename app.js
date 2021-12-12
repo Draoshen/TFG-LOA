@@ -146,15 +146,14 @@ function create ()
                 }
                 fichaSeleccionada=Ficha.fichaCanvas;
                 Ficha.fichaCanvas.setStrokeStyle(4,0xE5E228);
-                console.log("No me toques el código porfa");
                 casilla.setInteractive();
                 casilla.setStrokeStyle(4,0xE6EF2D);
-                console.log(Ficha);
-                console.log("Horizontal moves: "+calcularMovesHorizontales(Ficha));
-                console.log("Vertical moves: "+calcularMovesVerticales(Ficha));
-                console.log("Diagonal Ascendente moves: "+calcularMovesDiagonalesAscendente(Ficha));
-                console.log("Diagonal Descendente moves: "+calcularMovesDiagonalesDescendente(Ficha));
-                console.log(moveFicha(Ficha));
+                // console.log("Horizontal moves: "+calcularMovesHorizontales(Ficha));
+                // console.log("Vertical moves: "+calcularMovesVerticales(Ficha));
+                // console.log("Diagonal Ascendente moves: "+calcularMovesDiagonalesAscendente(Ficha));
+                // console.log("Diagonal Descendente moves: "+calcularMovesDiagonalesDescendente(Ficha));
+                moveFicha(Ficha);
+                //console.log(moveFicha(Ficha));
                 //console.log(Ficha);
                  });
 
@@ -262,6 +261,7 @@ function create ()
 
 
         function colocarFichasNegras(){
+            let i=0;
             var positionX;
             var positionY;
             //Primera fila
@@ -296,6 +296,26 @@ function create ()
                 
                 
             }
+        }
+        function getFichaByCasillasBoard(casilla){
+            fichasNegras.forEach(element =>{
+                if (""+element.casillaObjeto.id===""+casilla.id){
+                    element.fichaCanvas.destroy();
+                    element.casillaObjeto.tieneFicha=false;
+                    element.casilla=null;
+                    element=null;
+                    return element
+                }
+            });
+            fichasBlancas.forEach(element =>{
+                if (""+element.casillaObjeto.id===""+casilla.id){
+                    element.fichaCanvas.destroy();
+                    element.casillaObjeto.tieneFicha=false;
+                    element.casilla=null;
+                    element=null;
+                    return element
+                }
+            });
         }
         function colocarFichasBlancas(){
             var positionX;
@@ -771,16 +791,29 @@ function create ()
                 mapCasillasHighlighted.set(casillasHighlighted[indexMoves],casillaPintar.id);
                 casillasHighlighted[indexMoves].setStrokeStyle(4, 0x9172AC);
                 casillasHighlighted[indexMoves].setInteractive().on('pointerup',function(){
-                    console.log("You are already dead");
                     if (Ficha!=null) {
                         Ficha.fichaCanvas.destroy();
                         Ficha.casillaObjeto.tieneFicha=false;
                         Ficha.casilla=null;
                         Ficha=null;
                     }
+                    if (casillasBoard[mapCasillasHighlighted.get(this)].tieneFicha) {
+                        //console.log("You killed an enemy");
+                        //console.log(fichasNegras);
+                        //console.log(fichasBlancas);
+                        getFichaByCasillasBoard(casillasBoard[mapCasillasHighlighted.get(this)]);
+                    }
                     Ficha=new fichaTablero(casillas[mapCasillasHighlighted.get(this)],jugador,gameScene,casillasBoard[mapCasillasHighlighted.get(this)]);
+                    if (jugador=="blancas") {
+                        fichasBlancas.push(Ficha);
+                    }
+                    if (jugador=="negras") {
+                        fichasNegras.push(Ficha);
+                    }
+                    reciclar(fichasNegras);
+                    reciclar(fichasBlancas);
+                    //Ficha=new fichaTablero(casillas[mapCasillasHighlighted.get(this)],jugador,gameScene,casillasBoard[mapCasillasHighlighted.get(this)]);
                     fichaSeleccionada.setStrokeStyle(0,0x000000);
-                    console.log(mapCasillasHighlighted.get(this));
                     casillasHighlighted.forEach(element =>{
                         element.destroy();
                     });
@@ -805,6 +838,14 @@ function create ()
         function movilityFicha(Ficha){
             Ficha.fichaCanvas.setInteractive();
 
+        }
+        function reciclar(fichasArray){
+            for (let index = 0; index < fichasArray.length; index++) {
+                if (fichasArray[index].casilla==null) {
+                    fichasArray.splice(index,1);
+                }
+                
+            }
         }
         //pintarBordeTablero();
     //    identificadoresTablero.forEach(element => {
@@ -862,7 +903,7 @@ function create ()
            casillasHighlighted.forEach(element =>{
                element.destroy();
            });
-           console.log(casillasBoard[indexPrueba]);
-           console.log(casillasBoard[map1.get("5d")]);
+           console.log("Negras: "+fichasNegras.length);
+           console.log("Blancas: "+fichasBlancas.length);
        });
 }
