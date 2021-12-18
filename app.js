@@ -43,6 +43,7 @@ let fichasNegras = [];
 let identificadoresTablero=[];
 let turnoPartida=true;
 let partidaAcabada=false;
+let defaultBoard=true;
 const colorFichasNegras = 0x3B292C;
 const colorFichasBlancas = 0x964C3E;
 const colorFichasPruebas= 0x44327E;
@@ -281,26 +282,36 @@ function create ()
 
 
         function colocarFichasNegras(){
-            let i=0;
-            var positionX;
-            var positionY;
-            //Primera fila
-            for (let index = 1; index < 7; index++) {
-                positionX=casillasBoard[index].posX;
-                positionY=casillasBoard[index].posY;
+            //defaultBoard=false;
+            if(defaultBoard){
+                let i=0;
+                var positionX;
+                var positionY;
+                //Primera fila
+                for (let index = 1; index < 7; index++) {
+                    positionX=casillasBoard[index].posX;
+                    positionY=casillasBoard[index].posY;
 
-                //Añadimos la fichita
-                fichasNegras[i]=new fichaTablero(casillas[index],"negras",escena,casillasBoard[index]);
-                i++;
+                    //Añadimos la fichita
+                    fichasNegras[i]=new fichaTablero(casillas[index],"negras",escena,casillasBoard[index]);
+                    i++;
+                }
+                //Ultima fila
+                for (let index = 1; index < 7; index++) {
+                    positionX=casillasBoard[index+56].posX;
+                    positionY=casillasBoard[index+56].posY;
+
+                    //Añadimos la fichita
+                    fichasNegras[i]=new fichaTablero(casillas[index+56],"negras",escena,casillasBoard[index+56]);;
+                    i++;
+                }
             }
-            //Ultima fila
-            for (let index = 1; index < 7; index++) {
-                positionX=casillasBoard[index+56].posX;
-                positionY=casillasBoard[index+56].posY;
+            else{
+                let arrayNegras=["7d","1e"];
+                for (let index = 0; index < arrayNegras.length; index++) {
+                     fichasNegras[index]=(new fichaTablero(casillas[map1.get(arrayNegras[index])],"negras",escena,casillasBoard[map1.get(arrayNegras[index])]));   
+                }
 
-                //Añadimos la fichita
-                fichasNegras[i]=new fichaTablero(casillas[index+56],"negras",escena,casillasBoard[index+56]);;
-                i++;
             }
         }
         function actualizarFichasLimites(){
@@ -353,25 +364,34 @@ function create ()
             }
         }
         function colocarFichasBlancas(){
-            var positionX;
-            var positionY;
-            let i=0;
-            //Primera fila
-            for (let index = 1; index < 7; index++) {
-                positionX=casillasBoard[index*8].posX;
-                positionY=casillasBoard[index*8].posY;
-
-                //Añadimos la fichita
-                fichasBlancas[i]=new fichaTablero(casillas[index*8],"blancas",escena,casillasBoard[index*8]);
-                 i++;
+            //defaultBoard=false;
+            if (defaultBoard) {
+                var positionX;
+                var positionY;
+                let i=0;
+                //Primera fila
+                for (let index = 1; index < 7; index++) {
+                    positionX=casillasBoard[index*8].posX;
+                    positionY=casillasBoard[index*8].posY;
+    
+                    //Añadimos la fichita
+                    fichasBlancas[i]=new fichaTablero(casillas[index*8],"blancas",escena,casillasBoard[index*8]);
+                     i++;
+                }
+                for (let index = 1; index < 7; index++) {
+                    positionX=casillasBoard[(index+1)*8-1].posX;
+                    positionY=casillasBoard[(index+1)*8-1].posY;
+                    
+                    //Añadimos la fichita
+                    fichasBlancas[i]=new fichaTablero(casillas[(index+1)*8-1],"blancas",escena,casillasBoard[(index+1)*8-1]);;
+                     i++;
+                }
             }
-            for (let index = 1; index < 7; index++) {
-                positionX=casillasBoard[(index+1)*8-1].posX;
-                positionY=casillasBoard[(index+1)*8-1].posY;
-                
-                //Añadimos la fichita
-                fichasBlancas[i]=new fichaTablero(casillas[(index+1)*8-1],"blancas",escena,casillasBoard[(index+1)*8-1]);;
-                 i++;
+            else{
+                let arrayBlancas=["7d","1e"];
+                for (let index = 0; index < arrayBlancas.length; index++) {
+                     fichasNegras[index]=(new fichaTablero(casillas[map1.get(arrayBlancas[index])],"negras",escena,casillasBoard[map1.get(arrayBlancas[index])]));   
+                }
             }
             //Ultima fila
             
@@ -793,14 +813,14 @@ function create ()
             return casillasToMove;
         }
         function terminarPartidaBlancas(){
-            let fichasConectadasCopy = fichasConectadas(fichasBlancas[1]);
+            let fichasConectadasCopy = fichasConectadas(fichasBlancas[0]);
                 if (fichasConectadasCopy.length==fichasBlancas.length) {
                     partidaAcabada=true;
                     alert("Ganan Blancas");
                 }
         }
         function terminarPartidaNegras(){
-            let fichasConectadasCopy = fichasConectadas(fichasNegras[1]);
+            let fichasConectadasCopy = fichasConectadas(fichasNegras[0]);
                 if (fichasConectadasCopy.length==fichasNegras.length) {
                     partidaAcabada=true;
                     alert("Ganan Negras");

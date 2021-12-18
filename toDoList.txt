@@ -1,0 +1,2 @@
+BUGS A CORREGIR:
+    -La alerta de ganar salta antes de que la ficha se haya colocado
