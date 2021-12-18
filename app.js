@@ -795,12 +795,14 @@ function create ()
         function terminarPartidaBlancas(){
             let fichasConectadasCopy = fichasConectadas(fichasBlancas[1]);
                 if (fichasConectadasCopy.length==fichasBlancas.length) {
+                    partidaAcabada=true;
                     alert("Ganan Blancas");
                 }
         }
         function terminarPartidaNegras(){
             let fichasConectadasCopy = fichasConectadas(fichasNegras[1]);
                 if (fichasConectadasCopy.length==fichasNegras.length) {
+                    partidaAcabada=true;
                     alert("Ganan Negras");
                 }
         }
@@ -847,9 +849,7 @@ function create ()
                         Ficha=null;
                     }
                     if (casillasBoard[mapCasillasHighlighted.get(this)].tieneFicha) {
-                        //console.log("You killed an enemy");
-                        //console.log(fichasNegras);
-                        //console.log(fichasBlancas);
+
                         getFichaByCasillasBoard(casillasBoard[mapCasillasHighlighted.get(this)]);
                     }
                     Ficha=new fichaTablero(casillas[mapCasillasHighlighted.get(this)],jugador,gameScene,casillasBoard[mapCasillasHighlighted.get(this)]);
