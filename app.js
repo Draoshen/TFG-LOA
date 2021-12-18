@@ -129,9 +129,15 @@ function create ()
                          });
 
         }
+
         
       }
-
+      class CentroDeMasas{
+        constructor(){
+            this.posX=0;
+            this.posY=0;
+        }
+    }
     let escena=this; 
    //this.add.image(400, 300, 'sky');
    //scene.input.enabled = enabled; // enabled: true/false
@@ -203,6 +209,8 @@ function create ()
         for (let i = 0; i < casillasBoard.length; i++) {
             casillasBoard[i].setCasillaCanvas(casillas[i]);
         }
+        let centroDeMasaNegras= new CentroDeMasas();
+        let centroDeMasaBlancas= new CentroDeMasas();
         const letrasTablero=["a","b","c","d","e","f","g","h"];
         let mapColors = new Map();
         let mapCasillasHighlighted= new Map();
@@ -282,7 +290,7 @@ function create ()
 
 
         function colocarFichasNegras(){
-            //defaultBoard=false;
+            defaultBoard=false;
             if(defaultBoard){
                 let i=0;
                 var positionX;
@@ -307,12 +315,45 @@ function create ()
                 }
             }
             else{
-                let arrayNegras=["7d","1e"];
+                let arrayNegras=["6c","3c","4d","6e","5f"];
                 for (let index = 0; index < arrayNegras.length; index++) {
                      fichasNegras[index]=(new fichaTablero(casillas[map1.get(arrayNegras[index])],"negras",escena,casillasBoard[map1.get(arrayNegras[index])]));   
                 }
 
             }
+        }
+        function colocarFichasBlancas(){
+            defaultBoard=false;
+            if (defaultBoard) {
+                var positionX;
+                var positionY;
+                let i=0;
+                //Primera fila
+                for (let index = 1; index < 7; index++) {
+                    positionX=casillasBoard[index*8].posX;
+                    positionY=casillasBoard[index*8].posY;
+    
+                    //Añadimos la fichita
+                    fichasBlancas[i]=new fichaTablero(casillas[index*8],"blancas",escena,casillasBoard[index*8]);
+                     i++;
+                }
+                for (let index = 1; index < 7; index++) {
+                    positionX=casillasBoard[(index+1)*8-1].posX;
+                    positionY=casillasBoard[(index+1)*8-1].posY;
+                    
+                    //Añadimos la fichita
+                    fichasBlancas[i]=new fichaTablero(casillas[(index+1)*8-1],"blancas",escena,casillasBoard[(index+1)*8-1]);;
+                     i++;
+                }
+            }
+            else{
+                let arrayBlancas=["7b","7d","2e","3h","5h","2h","1h","1g","4h"];
+                for (let index = 0; index < arrayBlancas.length; index++) {
+                     fichasBlancas[index]=(new fichaTablero(casillas[map1.get(arrayBlancas[index])],"blancas",escena,casillasBoard[map1.get(arrayBlancas[index])]));   
+                }
+            }
+            //Ultima fila
+            
         }
         function actualizarFichasLimites(){
             const numFilas=8;
@@ -362,39 +403,6 @@ function create ()
                 }
                 
             }
-        }
-        function colocarFichasBlancas(){
-            //defaultBoard=false;
-            if (defaultBoard) {
-                var positionX;
-                var positionY;
-                let i=0;
-                //Primera fila
-                for (let index = 1; index < 7; index++) {
-                    positionX=casillasBoard[index*8].posX;
-                    positionY=casillasBoard[index*8].posY;
-    
-                    //Añadimos la fichita
-                    fichasBlancas[i]=new fichaTablero(casillas[index*8],"blancas",escena,casillasBoard[index*8]);
-                     i++;
-                }
-                for (let index = 1; index < 7; index++) {
-                    positionX=casillasBoard[(index+1)*8-1].posX;
-                    positionY=casillasBoard[(index+1)*8-1].posY;
-                    
-                    //Añadimos la fichita
-                    fichasBlancas[i]=new fichaTablero(casillas[(index+1)*8-1],"blancas",escena,casillasBoard[(index+1)*8-1]);;
-                     i++;
-                }
-            }
-            else{
-                let arrayBlancas=["7d","1e"];
-                for (let index = 0; index < arrayBlancas.length; index++) {
-                     fichasNegras[index]=(new fichaTablero(casillas[map1.get(arrayBlancas[index])],"negras",escena,casillasBoard[map1.get(arrayBlancas[index])]));   
-                }
-            }
-            //Ultima fila
-            
         }
         function getCasillaObjetoById(idBoard){
             for (let i = 0; i < casillasBoard.length; i++) {
@@ -923,6 +931,62 @@ function create ()
                 
             }
         }
+        function centroDeMasasNegrasFunc(){
+            let SumPosX=0;
+            let SumPosY=0;
+
+            for (let i = 0; i < fichasNegras.length; i++) {
+                    SumPosX+=parseInt(fichasNegras[i].casillaObjeto.idTablero.split("")[0]);
+                    SumPosY+=letrasTablero.indexOf(fichasNegras[i].casillaObjeto.idTablero[1])+1;                
+            }
+            centroDeMasaNegras.posX=Number((SumPosX/fichasNegras.length).toFixed(0));
+            centroDeMasaNegras.posY=Number((SumPosY/fichasNegras.length).toFixed(0));
+            console.log(centroDeMasaNegras);
+        }
+        function centroDeMasasBlancasFunc(){
+            let SumPosX=0;
+            let SumPosY=0;
+
+            for (let i = 0; i < fichasBlancas.length; i++) {
+                    SumPosX+=parseInt(fichasBlancas[i].casillaObjeto.idTablero.split("")[0]);
+                    SumPosY+=letrasTablero.indexOf(fichasBlancas[i].casillaObjeto.idTablero[1])+1;                
+            }
+            centroDeMasaBlancas.posX=Number((SumPosX/fichasBlancas.length).toFixed(0));
+            centroDeMasaBlancas.posY=Number((SumPosX/fichasBlancas.length).toFixed(0));
+            console.log(centroDeMasaBlancas);
+        }
+        function distanciaFichaCentroMasas(Ficha,centroDeMasas){
+                let posX = parseInt(Ficha.casillaObjeto.idTablero.split("")[0]);
+                let posY = letrasTablero.indexOf(Ficha.casillaObjeto.idTablero[1])+1;
+                let distance=0;
+                if (posX == centroDeMasas.posX) {
+                   return  distance = Math.abs(posY-centroDeMasas.posY);
+                }
+                if (posY == centroDeMasas.posY) {
+                   return  distance = Math.abs(posX-centroDeMasas.posX);
+                }
+                if (Math.abs(posX-centroDeMasas.posX)<=Math.abs(posY-centroDeMasas.posY)) {
+                    distance=Math.abs(posX-centroDeMasas.posX);
+                    if (posY-centroDeMasas.posY>=0) {
+                        return distance+=Math.abs(posY-centroDeMasas.posY)-distance
+                    }
+                    if (posY-centroDeMasas.posY<0) {
+                        distance+=Math.abs(posY-centroDeMasas.posY)-distance
+                    }
+                }
+                if (Math.abs(posY-centroDeMasas.posY)<=Math.abs(posX-centroDeMasas.posX)) {
+                    distance=Math.abs(posY-centroDeMasas.posY);
+                    console.log("valor de distance= "+distance);
+                    if (posX-centroDeMasas.posX>=0) {
+                        return distance+=Math.abs(posX-centroDeMasas.posX)-distance
+                    }
+                    if (posX-centroDeMasas.posX<0) {
+                        console.log("entré aquí");
+                        distance+=Math.abs(posX-centroDeMasas.posX)+distance
+                    }
+                }
+                return distance;
+        }
         //pintarBordeTablero();
     //    identificadoresTablero.forEach(element => {
     //        console.log(element);
@@ -973,13 +1037,19 @@ function create ()
     //    //casilla_sombrear(casillas[getCasillaObjetoById(moveHorizontal(myFichaPrueba))]);
     //    //casillas_sombrear_direcciones(myFichaPrueba);
     //      });
+
        let a = gameScene.add.rectangle(900,900,ladoCasilla,ladoCasilla,0x9172AC).setInteractive();
        a.on('pointerup',function() {
            //a.destroy();
            casillasHighlighted.forEach(element =>{
                element.destroy();
            });
-              console.log(turnoPartida);
+             centroDeMasasNegrasFunc();
+             centroDeMasasBlancasFunc();
+             let fichaEscogida=fichasBlancas[8];
+             fichaEscogida.casillaObjeto.casillaCanvas.setStrokeStyle(4,0x2BB26E);
+             casillasBoard[map1.get(""+centroDeMasaBlancas.posX+letrasTablero[(centroDeMasaBlancas.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
+             console.log(distanciaFichaCentroMasas(fichaEscogida,centroDeMasaBlancas));
         //    console.log("Negras: "+fichasNegras.length);
         //    console.log("Blancas: "+fichasBlancas.length);
        });
