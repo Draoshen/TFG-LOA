@@ -41,6 +41,8 @@ let casillasHighlighted=[];
 let fichaSeleccionada=null;
 let fichasNegras = [];
 let identificadoresTablero=[];
+let turnoPartida=true;
+let partidaAcabada=false;
 const colorFichasNegras = 0x3B292C;
 const colorFichasBlancas = 0x964C3E;
 const colorFichasPruebas= 0x44327E;
@@ -94,37 +96,37 @@ function create ()
             else{
                 this.fichaCanvas=gameScene.add.circle(casillaObjeto.posX, casillaObjeto.posY, 40, colorFichasNegras).setInteractive();
             }
-            this.fichaCanvas.on('pointerdown', function() {
-                
-                if (fichaSeleccionada!=null) {
-                    fichaSeleccionada.setStrokeStyle(0,0x000000);
-                }
-                fichaSeleccionada=Ficha.fichaCanvas;
-                Ficha.fichaCanvas.setStrokeStyle(4,0xE5E228);
-                casilla.setInteractive();
-                casilla.setStrokeStyle(4,0xE6EF2D);
-                // console.log("Horizontal moves: "+calcularMovesHorizontales(Ficha));
-                // console.log("Vertical moves: "+calcularMovesVerticales(Ficha));
-                // console.log("Diagonal Ascendente moves: "+calcularMovesDiagonalesAscendente(Ficha));
-                // console.log("Diagonal Descendente moves: "+calcularMovesDiagonalesDescendente(Ficha));
-                moveFicha(Ficha);
-
-                //console.log(moveFicha(Ficha));
-                //console.log(Ficha);
-                 });
-
-            
-             this.fichaCanvas.on('pointerup', function() {
-    
+                this.fichaCanvas.on('pointerdown', function() {
+                if (turnoPartida==true && jugador=="blancas" && partidaAcabada==false) {
+                    if (fichaSeleccionada!=null) {
+                        fichaSeleccionada.setStrokeStyle(0,0x000000);
+                    }
+                    fichaSeleccionada=Ficha.fichaCanvas;
+                    Ficha.fichaCanvas.setStrokeStyle(4,0xE5E228);
                     casilla.setInteractive();
-                    casilla.setStrokeStyle(0,0x000000);
-                    //console.log();
+                    //casilla.setStrokeStyle(4,0xE6EF2D);
+                    moveFicha(Ficha);
+                }
+                if (turnoPartida==false &&jugador==="negras" && partidaAcabada==false) {
+                    if (fichaSeleccionada!=null) {
+                        fichaSeleccionada.setStrokeStyle(0,0x000000);
+                    }
+                    fichaSeleccionada=Ficha.fichaCanvas;
+                    Ficha.fichaCanvas.setStrokeStyle(4,0xE5E228);
+                    casilla.setInteractive();
+                    //casilla.setStrokeStyle(4,0xE6EF2D);
+                    moveFicha(Ficha);
+                }
                      });
-        }
-        get movimientos(){
-            let DiagonalAscendente=[];
-            let casillasMovimientos =[];
-            let casillasMovimientosObject=[];
+    
+                
+                 this.fichaCanvas.on('pointerup', function() {
+        
+                        casilla.setInteractive();
+                        casilla.setStrokeStyle(0,0x000000);
+                        //console.log();
+                         });
+
         }
         
       }
@@ -853,9 +855,11 @@ function create ()
                     Ficha=new fichaTablero(casillas[mapCasillasHighlighted.get(this)],jugador,gameScene,casillasBoard[mapCasillasHighlighted.get(this)]);
                     if (jugador=="blancas") {
                         fichasBlancas.push(Ficha);
+                        turnoPartida=false;
                     }
                     if (jugador=="negras") {
                         fichasNegras.push(Ficha);
+                        turnoPartida=true;
                     }
                     reciclar(fichasNegras);
                     reciclar(fichasBlancas);
@@ -883,6 +887,7 @@ function create ()
                });
             //    terminarPartidaNegras();
             //    terminarPartidaBlancas();
+
             return movesFicha;
 
         }
@@ -954,7 +959,8 @@ function create ()
            casillasHighlighted.forEach(element =>{
                element.destroy();
            });
-           console.log("Negras: "+fichasNegras.length);
-           console.log("Blancas: "+fichasBlancas.length);
+              console.log(turnoPartida);
+        //    console.log("Negras: "+fichasNegras.length);
+        //    console.log("Blancas: "+fichasBlancas.length);
        });
 }
