@@ -138,6 +138,9 @@ function create ()
             this.posY=0;
         }
     }
+    let centroTablero = new CentroDeMasas();
+    centroTablero.posX=4.5;
+    centroTablero.posY=4.5
     let escena=this; 
    //this.add.image(400, 300, 'sky');
    //scene.input.enabled = enabled; // enabled: true/false
@@ -315,7 +318,7 @@ function create ()
                 }
             }
             else{
-                let arrayNegras=["6c","3c","4d","6e","5f","8a","8h"];
+                let arrayNegras=["6c","3c","4d","6e","5f"];
                 for (let index = 0; index < arrayNegras.length; index++) {
                      fichasNegras[index]=(new fichaTablero(casillas[map1.get(arrayNegras[index])],"negras",escena,casillasBoard[map1.get(arrayNegras[index])]));   
                 }
@@ -347,7 +350,7 @@ function create ()
                 }
             }
             else{
-                let arrayBlancas=["7b","7d","2e","3h","5h","2h","1h","1g","4h"];
+                let arrayBlancas=["7b","7d","2e","3h"];
                 for (let index = 0; index < arrayBlancas.length; index++) {
                      fichasBlancas[index]=(new fichaTablero(casillas[map1.get(arrayBlancas[index])],"blancas",escena,casillasBoard[map1.get(arrayBlancas[index])]));   
                 }
@@ -957,12 +960,51 @@ function create ()
             let distanceMediaEquipo=0;
             centroDeMasasNegrasFunc();
             for (let i = 0; i < fichasNegras.length; i++) {
-                console.log(fichasNegras[i].casillaObjeto.idTablero+":"+distanciaFichaCentroMasas(fichasNegras[i],centroDeMasaNegras));
                 distanceMediaEquipo += distanciaFichaCentroMasas(fichasNegras[i],centroDeMasaNegras);
-                console.log(distanceMediaEquipo);
             }
-            console.log(distanceMediaEquipo/fichasNegras.length);
             return distanceMediaEquipo/fichasNegras.length;
+        }
+        function distanciaMediaEquipoBlancas(){
+            let distanceMediaEquipo=0;
+            centroDeMasasBlancasFunc();
+            for (let i = 0; i < fichasBlancas.length; i++) {
+                distanceMediaEquipo += distanciaFichaCentroMasas(fichasBlancas[i],centroDeMasaNegras);
+            }
+            return distanceMediaEquipo/fichasBlancas.length;
+        }
+        function concentracionNegras(){
+            
+            let concentracionNegras=distanciaMediaEquipoNegras();
+
+            return 1/concentracionNegras;
+
+        }
+        function concentracionBlancas(){
+            
+            let concentracionBlancas=distanciaMediaEquipoBlancas();
+
+            return 1/concentracionBlancas;
+
+        }
+        function fichasEnBordeNegras(){
+            let fichasEnBordeNegras=0;
+            for (let i = 0; i < fichasNegras.length; i++) {
+                if(fichasNegras[i].casillaObjeto.CasillaLimite){
+                    fichasEnBordeNegras++;
+                }
+                
+            }
+            return fichasEnBordeNegras;
+        }
+        function fichasEnBordeBlancas(){
+            let fichasEnBordeBlancas=0;
+            for (let i = 0; i < fichasBlancas.length; i++) {
+                if(fichasBlancas[i].casillaObjeto.CasillaLimite){
+                    fichasEnBordeBlancas++;
+                }
+                
+            }
+            return fichasEnBordeBlancas;
         }
         function distanciaFichaCentroMasas(Ficha,centroDeMasas){
                 let posX = parseInt(Ficha.casillaObjeto.idTablero.split("")[0]);
@@ -998,6 +1040,35 @@ function create ()
 
                 return distance;
         }
+        function distancia_centrTablero_CdM_Blancas(){
+                centroDeMasasBlancasFunc();
+                let centroTablero = new CentroDeMasas();
+                centroTablero.posX=4.5;
+                centroTablero.posY=4.5
+                let val_x;
+                let val_y;
+                val_x=centroTablero.posX-Math.pow((centroTablero.posX-centroDeMasaBlancas.posX),2);
+                val_y=centroTablero.posY-Math.pow((centroTablero.posY-centroDeMasaBlancas.posY),2);
+
+                return val_x+val_y;
+        }
+        function distancia_centrTablero_CdM_Negras(){
+            centroDeMasasNegrasFunc();
+            let centroTablero = new CentroDeMasas();
+            centroTablero.posX=4.5;
+            centroTablero.posY=4.5
+            let val_x;
+            let val_y;
+            val_x=centroTablero.posX-((centroTablero.posX-centroDeMasaNegras.posX)*(centroTablero.posX-centroDeMasaNegras.posX));
+            val_y=centroTablero.posY-((centroTablero.posY-centroDeMasaNegras.posY)*(centroTablero.posY-centroDeMasaNegras.posY));
+            
+            return val_x+val_y;
+    }
+    function funcEval(){
+        let arrayPesos=[1000,20,1]
+        let peso=arrayPesos[0]*(concentracionBlancas()-concentracionNegras())+arrayPesos[1]*(fichasEnBordeBlancas()-fichasEnBordeNegras())+distancia_centrTablero_CdM_Blancas()-distancia_centrTablero_CdM_Negras()+Math.random();
+        return peso;
+    }
         //pintarBordeTablero();
     //    identificadoresTablero.forEach(element => {
     //        console.log(element);
@@ -1055,13 +1126,12 @@ function create ()
            casillasHighlighted.forEach(element =>{
                element.destroy();
            });
-             centroDeMasasNegrasFunc();
-             centroDeMasasBlancasFunc();
-             let fichaEscogida=fichasBlancas[8];
-             fichaEscogida.casillaObjeto.casillaCanvas.setStrokeStyle(4,0x2BB26E);
-             distanciaMediaEquipoNegras();
-             casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
-             console.log(centroDeMasaNegras);
+            //  centroDeMasasNegrasFunc();
+            //  centroDeMasasBlancasFunc();
+            //  distanciaMediaEquipoNegras();
+            //  casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
+            //  console.log(centroDeMasaBlancas);
+             console.log(funcEval());
         //    console.log("Blancas: "+fichasBlancas.length);
        });
 }
