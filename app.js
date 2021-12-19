@@ -315,7 +315,7 @@ function create ()
                 }
             }
             else{
-                let arrayNegras=["6c","3c","4d","6e","5f"];
+                let arrayNegras=["6c","3c","4d","6e","5f","8a","8h"];
                 for (let index = 0; index < arrayNegras.length; index++) {
                      fichasNegras[index]=(new fichaTablero(casillas[map1.get(arrayNegras[index])],"negras",escena,casillasBoard[map1.get(arrayNegras[index])]));   
                 }
@@ -941,7 +941,6 @@ function create ()
             }
             centroDeMasaNegras.posX=Number((SumPosX/fichasNegras.length).toFixed(0));
             centroDeMasaNegras.posY=Number((SumPosY/fichasNegras.length).toFixed(0));
-            console.log(centroDeMasaNegras);
         }
         function centroDeMasasBlancasFunc(){
             let SumPosX=0;
@@ -953,7 +952,17 @@ function create ()
             }
             centroDeMasaBlancas.posX=Number((SumPosX/fichasBlancas.length).toFixed(0));
             centroDeMasaBlancas.posY=Number((SumPosX/fichasBlancas.length).toFixed(0));
-            console.log(centroDeMasaBlancas);
+        }
+        function distanciaMediaEquipoNegras(){
+            let distanceMediaEquipo=0;
+            centroDeMasasNegrasFunc();
+            for (let i = 0; i < fichasNegras.length; i++) {
+                console.log(fichasNegras[i].casillaObjeto.idTablero+":"+distanciaFichaCentroMasas(fichasNegras[i],centroDeMasaNegras));
+                distanceMediaEquipo += distanciaFichaCentroMasas(fichasNegras[i],centroDeMasaNegras);
+                console.log(distanceMediaEquipo);
+            }
+            console.log(distanceMediaEquipo/fichasNegras.length);
+            return distanceMediaEquipo/fichasNegras.length;
         }
         function distanciaFichaCentroMasas(Ficha,centroDeMasas){
                 let posX = parseInt(Ficha.casillaObjeto.idTablero.split("")[0]);
@@ -963,6 +972,7 @@ function create ()
                    return  distance = Math.abs(posY-centroDeMasas.posY);
                 }
                 if (posY == centroDeMasas.posY) {
+
                    return  distance = Math.abs(posX-centroDeMasas.posX);
                 }
                 if (Math.abs(posX-centroDeMasas.posX)<=Math.abs(posY-centroDeMasas.posY)) {
@@ -971,20 +981,21 @@ function create ()
                         return distance+=Math.abs(posY-centroDeMasas.posY)-distance
                     }
                     if (posY-centroDeMasas.posY<0) {
-                        distance+=Math.abs(posY-centroDeMasas.posY)-distance
+
+                        return distance+=Math.abs(posY-centroDeMasas.posY)-distance
                     }
                 }
                 if (Math.abs(posY-centroDeMasas.posY)<=Math.abs(posX-centroDeMasas.posX)) {
                     distance=Math.abs(posY-centroDeMasas.posY);
-                    console.log("valor de distance= "+distance);
                     if (posX-centroDeMasas.posX>=0) {
+
                         return distance+=Math.abs(posX-centroDeMasas.posX)-distance
                     }
                     if (posX-centroDeMasas.posX<0) {
-                        console.log("entré aquí");
-                        distance+=Math.abs(posX-centroDeMasas.posX)+distance
+                       return distance+=Math.abs(posX-centroDeMasas.posX)-distance
                     }
                 }
+
                 return distance;
         }
         //pintarBordeTablero();
@@ -1048,9 +1059,9 @@ function create ()
              centroDeMasasBlancasFunc();
              let fichaEscogida=fichasBlancas[8];
              fichaEscogida.casillaObjeto.casillaCanvas.setStrokeStyle(4,0x2BB26E);
-             casillasBoard[map1.get(""+centroDeMasaBlancas.posX+letrasTablero[(centroDeMasaBlancas.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
-             console.log(distanciaFichaCentroMasas(fichaEscogida,centroDeMasaBlancas));
-        //    console.log("Negras: "+fichasNegras.length);
+             distanciaMediaEquipoNegras();
+             casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
+             console.log(centroDeMasaNegras);
         //    console.log("Blancas: "+fichasBlancas.length);
        });
 }
