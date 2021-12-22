@@ -1324,6 +1324,39 @@ function create ()
         let peso=arrayPesos[0]*(concentracionBlancas()-concentracionNegras())+arrayPesos[1]*(fichasEnBordeBlancas()-fichasEnBordeNegras())+distancia_centrTablero_CdM_Blancas()-distancia_centrTablero_CdM_Negras()+Math.random();
         return peso;
     }
+    function Is_next_move_eating(casilla){
+        let comer=false;
+
+    }
+    function next_move_Blancas_TableroFic(Ficha,casilla,TableroFic){
+        TableroFic.mapMoves.set(Ficha,casilla);
+        fichasBlancas.forEach(element => {
+            if(element===Ficha){
+                TableroFic.fichasBlancas.push(new FichaFic(element.jugador,casilla,map1.get(casilla)));
+                TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
+            }
+            else{
+                TableroFic.fichasBlancas.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
+                TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
+            }
+
+        });
+        fichasNegras.forEach(element => {
+            TableroFic.fichasNegras.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
+            TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
+        });
+    }
+    function conversorTableroFic(TableroFic){
+        fichasBlancas.forEach(element => {
+            TableroFic.fichasBlancas.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
+            TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
+        });
+        fichasNegras.forEach(element => {
+            TableroFic.fichasNegras.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
+            TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
+        });
+        return TableroFic;
+    }
         //pintarBordeTablero();
     //    identificadoresTablero.forEach(element => {
     //        console.log(element);
@@ -1390,9 +1423,26 @@ function create ()
              //console.log(moves_blancas());
         //    console.log("Blancas: "+fichasBlancas.length);
        });
-       let tableroPrueba= new TableroFic();
-       //console.log(tableroPrueba.casillasTablero);
-       conversorTableroFic(tableroPrueba);
-       console.log(tableroPrueba.funcEval());
 
+       let tableroPrueba2 = new TableroFic();
+       let arrayTablerosFicBlancas= [];
+       for (let j = 0,contador=0; j < fichasBlancas.length; j++) {
+            for (let i = 0; i < moves_Ficha_Func(fichasBlancas[j]).length; i++) {
+                arrayTablerosFicBlancas.push(new TableroFic());
+                let movesFicha=moves_Ficha_Func(fichasBlancas[j]);
+                next_move_Blancas_TableroFic(fichasBlancas[j],moves_Ficha_Func(fichasBlancas[j])[i],arrayTablerosFicBlancas[contador]);
+                contador++;
+            }
+       }
+       console.log(arrayTablerosFicBlancas);
+       next_move_Blancas_TableroFic(fichasBlancas[0],moves_Ficha_Func(fichasBlancas[0])[1],tableroPrueba2);
+       let max=-999999999;
+       arrayTablerosFicBlancas.forEach(element => {
+           console.log(element.funcEval());
+           if(element.funcEval()>max){
+                max=element.funcEval();
+                console.log(element.mapMoves);
+           }
+       });
+       console.log("El valor max para Blancas: "+max);
 }
