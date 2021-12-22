@@ -128,15 +128,239 @@ function create ()
                         //console.log();
                          });
 
+        } 
+      }
+      class TableroFic{
+        
+        constructor(){
+            this.centroDeMasaNegras= new CentroDeMasas();
+            this.centroDeMasaBlancas= new CentroDeMasas();
+            const letrasTablero=["a","b","c","d","e","f","g","h"];
+            this.mapMoves= new Map();
+            this.casillasTablero=[];
+            this.fichasBlancas=[];
+            this.fichasNegras=[];
+            let fichaLimite=false;
+            let tocaCambiarFila=false;
+            for (let fila = 0; fila <8; fila++) {
+                if (fila%2==1) {
+                    tocaCambiarFila=true;
+                }
+                else{
+                    tocaCambiarFila=false;
+                }
+                for (var i = 0; i < 8; i++) {
+                    if (tocaCambiarFila==false) {
+                        if (i%2==0) {
+                            //Esto es PAR
+                            this.casillasTablero[fila*8+i]= new CasillaFic(colorBlancasTablero,false,fila*8+i,identificadoresTablero[fila*8+i]);
+                        }
+                        else
+                            this.casillasTablero[fila*8+i]= new CasillaFic(colorNegrasTablero,false,fila*8+i,identificadoresTablero[fila*8+i]);
+                        //casillas[i].setOrigin(0,0);
+                        // console.log(casillas[i]);
+                    }
+                    else
+                        if (i%2==0) {
+                            //Esto es PAR
+                            this.casillasTablero[fila*8+i]= new CasillaFic(colorNegrasTablero,false,fila*8+i,identificadoresTablero[fila*8+i]);
+                        }
+                        else
+                            this.casillasTablero[fila*8+i]= new CasillaFic(colorBlancasTablero,false,fila*8+i,identificadoresTablero[fila*8+i]);
+                        //casillas[i].setOrigin(0,0);
+                        // console.log(casillas[i]);
+                        
+                    
+                 }
+                
+            }
+            const numFilas=8;
+            const numColumnas=8;
+            for (let i = 0; i < numFilas; i++) {
+                for (let j = 0; j < numColumnas; j++) {
+                    if (i==0 || i == numFilas-1 || j==0 || j==numColumnas-1) {
+                        this.casillasTablero[(i*8)+j].CasillaLimite=true;
+                    }
+                }               
+            }
+
+
         }
 
         
-      }
+        distanciaFichaCentroMasas(Ficha,centroDeMasas){
+            let posX = parseInt(Ficha.idTablero.split("")[0]);
+            let posY = letrasTablero.indexOf(Ficha.idTablero[1])+1;
+            let distance=0;
+            if (posX == centroDeMasas.posX) {
+               return  distance = Math.abs(posY-centroDeMasas.posY);
+            }
+            if (posY == centroDeMasas.posY) {
+
+               return  distance = Math.abs(posX-centroDeMasas.posX);
+            }
+            if (Math.abs(posX-centroDeMasas.posX)<=Math.abs(posY-centroDeMasas.posY)) {
+                distance=Math.abs(posX-centroDeMasas.posX);
+                if (posY-centroDeMasas.posY>=0) {
+                    return distance+=Math.abs(posY-centroDeMasas.posY)-distance
+                }
+                if (posY-centroDeMasas.posY<0) {
+
+                    return distance+=Math.abs(posY-centroDeMasas.posY)-distance
+                }
+            }
+            if (Math.abs(posY-centroDeMasas.posY)<=Math.abs(posX-centroDeMasas.posX)) {
+                distance=Math.abs(posY-centroDeMasas.posY);
+                if (posX-centroDeMasas.posX>=0) {
+
+                    return distance+=Math.abs(posX-centroDeMasas.posX)-distance
+                }
+                if (posX-centroDeMasas.posX<0) {
+                   return distance+=Math.abs(posX-centroDeMasas.posX)-distance
+                }
+            }
+
+            return distance;
+        
+        }
+        centroDeMasasBlancasFunc(){
+            let SumPosX=0;
+            let SumPosY=0;
+
+            for (let i = 0; i < this.fichasBlancas.length; i++) {
+                    SumPosX+=parseInt(this.fichasBlancas[i].idTablero.split("")[0]);
+                    SumPosY+=letrasTablero.indexOf(this.fichasBlancas[i].idTablero[1])+1;                
+            }
+            this.centroDeMasaBlancas.posX=Number((SumPosX/this.fichasBlancas.length).toFixed(0));
+            this.centroDeMasaBlancas.posY=Number((SumPosX/this.fichasBlancas.length).toFixed(0));
+            return this.centroDeMasaBlancas;
+        }
+        centroDeMasasNegrasFunc(){
+            let SumPosX=0;
+            let SumPosY=0;
+
+            for (let i = 0; i < this.fichasNegras.length; i++) {
+                    SumPosX+=parseInt(this.fichasNegras[i].idTablero.split("")[0]);
+                    SumPosY+=letrasTablero.indexOf(this.fichasNegras[i].idTablero[1])+1;                
+            }
+            this.centroDeMasaNegras.posX=Number((SumPosX/this.fichasNegras.length).toFixed(0));
+            this.centroDeMasaNegras.posY=Number((SumPosX/this.fichasNegras.length).toFixed(0));
+            return this.centroDeMasaNegras;
+        }
+        distanciaMediaEquipoBlancas(){
+            let distanceMediaEquipo=0;
+            this.centroDeMasasBlancasFunc();
+            for (let i = 0; i < this.fichasBlancas.length; i++) {
+                distanceMediaEquipo += this.distanciaFichaCentroMasas(this.fichasBlancas[i],this.centroDeMasaBlancas);
+            }
+            return distanceMediaEquipo/this.fichasBlancas.length;
+        }
+        distanciaMediaEquipoNegras(){
+            let distanceMediaEquipo=0;
+            this.centroDeMasasNegrasFunc();
+            for (let i = 0; i < this.fichasNegras.length; i++) {
+                distanceMediaEquipo += this.distanciaFichaCentroMasas(this.fichasNegras[i],this.centroDeMasaNegras);
+            }
+            return distanceMediaEquipo/this.fichasNegras.length;
+        }
+        concentracionBlancas(){
+            
+            let concentracionBlancas=this.distanciaMediaEquipoBlancas();
+
+            return 1/concentracionBlancas;
+
+        }
+        concentracionNegras(){
+                        
+            let concentracionBlancas=this.distanciaMediaEquipoNegras();
+
+            return 1/concentracionBlancas;
+            
+        }
+        distancia_centrTablero_CdM_Blancas(){
+            this.centroDeMasasBlancasFunc();
+            let centroTablero = new CentroDeMasas();
+            centroTablero.posX=4.5;
+            centroTablero.posY=4.5
+            let val_x;
+            let val_y;
+            val_x=centroTablero.posX-Math.pow((centroTablero.posX-this.centroDeMasaBlancas.posX),2);
+            val_y=centroTablero.posY-Math.pow((centroTablero.posY-this.centroDeMasaBlancas.posY),2);
+
+            return val_x+val_y;
+        }
+        distancia_centrTablero_CdM_Negras(){
+        this.centroDeMasasNegrasFunc();
+        let centroTablero = new CentroDeMasas();
+        centroTablero.posX=4.5;
+        centroTablero.posY=4.5
+        let val_x;
+        let val_y;
+        val_x=centroTablero.posX-Math.pow((centroTablero.posX-this.centroDeMasaNegras.posX),2);
+        val_y=centroTablero.posY-Math.pow((centroTablero.posY-this.centroDeMasaNegras.posY),2);
+
+        return val_x+val_y;
+        }
+        fichasEnBordeNegras(){
+            let fichasEnBordeNegras=0;
+            for (let i = 0; i < this.fichasNegras.length; i++) {
+                if(this.casillasTablero[this.fichasNegras[i].idNum].CasillaLimite){
+                    fichasEnBordeNegras++;
+                }
+                
+            }
+            return fichasEnBordeNegras;
+        }
+        fichasEnBordeBlancas(){
+            let fichasEnBordeBlancas=0;
+            for (let i = 0; i < this.fichasBlancas.length; i++) {
+                if(this.casillasTablero[this.fichasBlancas[i].idNum].CasillaLimite){
+                    fichasEnBordeBlancas++;
+                }
+                
+            }
+            return fichasEnBordeBlancas;
+        }
+        funcEval(){
+            let arrayPesos=[1000,20,1]
+            let peso=arrayPesos[0]*(this.concentracionBlancas()-this.concentracionNegras())+arrayPesos[1]*(this.fichasEnBordeBlancas()-this.fichasEnBordeNegras())+this.distancia_centrTablero_CdM_Blancas()-this.distancia_centrTablero_CdM_Negras()+Math.random();
+            return peso;
+        }
+    }
+    class CasillaFic{
+        constructor(color,tieneFicha,id,idTablero) {
+            this.color=color;
+            this.tieneFicha=tieneFicha;
+            this.id=id;
+            this.idTablero=idTablero;
+            this.CasillaLimite=false;
+            this.Ficha;  
+       } 
+    }
+    class FichaFic{
+        constructor(jugador,idTablero,idNum){
+            this.jugador=jugador;
+            this.idTablero=idTablero;
+            this.idNum=idNum;
+
+        }
+    }
       class CentroDeMasas{
         constructor(){
             this.posX=0;
             this.posY=0;
         }
+    }
+    function conversorTableroFic(TableroFic){
+        fichasBlancas.forEach(element => {
+            TableroFic.fichasBlancas.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
+            TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
+        });
+        fichasNegras.forEach(element => {
+            TableroFic.fichasNegras.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
+            TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
+        });
+        return TableroFic;
     }
     let centroTablero = new CentroDeMasas();
     centroTablero.posX=4.5;
@@ -823,6 +1047,37 @@ function create ()
             
             return casillasToMove;
         }
+        function moves_Ficha_Func(Ficha){
+            let moves_for_ficha=[];
+            moveHorizontal(Ficha).forEach(element => {
+                moves_for_ficha.push(element);
+            });
+            moveVertical(Ficha).forEach(element => {
+                moves_for_ficha.push(element);
+            });
+            moveDiagonalAscendente(Ficha).forEach(element => {
+                moves_for_ficha.push(element);
+            });
+            moveDiagonalDescendente(Ficha).forEach(element => {
+                moves_for_ficha.push(element);
+            });
+            return moves_for_ficha;
+
+        }
+        function moves_negras(){
+            let mapFicha_Moves = new Map();
+            for (let i = 0; i < fichasNegras.length; i++) {
+                mapFicha_Moves.set(fichasNegras[i],moves_Ficha_Func(fichasNegras[i]));
+            }
+            return mapFicha_Moves;
+        }
+        function moves_blancas(){
+            let mapFicha_Moves = new Map();
+            for (let i = 0; i < fichasBlancas.length; i++) {
+                mapFicha_Moves.set(fichasBlancas[i],moves_Ficha_Func(fichasBlancas[i]));
+            }
+            return mapFicha_Moves;
+        }
         function terminarPartidaBlancas(){
             let fichasConectadasCopy = fichasConectadas(fichasBlancas[0]);
                 if (fichasConectadasCopy.length==fichasBlancas.length) {
@@ -968,7 +1223,7 @@ function create ()
             let distanceMediaEquipo=0;
             centroDeMasasBlancasFunc();
             for (let i = 0; i < fichasBlancas.length; i++) {
-                distanceMediaEquipo += distanciaFichaCentroMasas(fichasBlancas[i],centroDeMasaNegras);
+                distanceMediaEquipo += distanciaFichaCentroMasas(fichasBlancas[i],centroDeMasaBlancas);
             }
             return distanceMediaEquipo/fichasBlancas.length;
         }
@@ -1132,6 +1387,12 @@ function create ()
             //  casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
             //  console.log(centroDeMasaBlancas);
              console.log(funcEval());
+             //console.log(moves_blancas());
         //    console.log("Blancas: "+fichasBlancas.length);
        });
+       let tableroPrueba= new TableroFic();
+       //console.log(tableroPrueba.casillasTablero);
+       conversorTableroFic(tableroPrueba);
+       console.log(tableroPrueba.funcEval());
+
 }
