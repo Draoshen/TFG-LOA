@@ -708,28 +708,30 @@ function create ()
 
         next_move_Negras_TableroFic(Ficha,casilla,TableroFic){
             TableroFic.mapMoves.set(Ficha,casilla);
-            fichasBlancas.forEach(element => {
-                let fichaToAdd =new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id);
+            this.fichasNegras.forEach(element => {
                 if(element===Ficha){
-                    if(true){
-                        
-                    }
-                    TableroFic.fichasBlancas.push(new FichaFic(element.jugador,casilla,map1.get(casilla)));
+                    TableroFic.fichasNegras.push(new FichaFic(element.jugador,casilla,map1.get(casilla)));
                     TableroFic.casillasTablero[map1.get(casilla)].tieneFicha=true;
-                    TableroFic.casillasTablero[map1.get(casilla)].colorFicha="blancas";
+                    TableroFic.casillasTablero[map1.get(casilla)].colorFicha="negras";
                 }
                 else{
-                    TableroFic.fichasBlancas.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
-                    TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
-                    TableroFic.casillasTablero[element.casillaObjeto.id].colorFicha="blancas";
+                    TableroFic.fichasNegras.push(new FichaFic(element.jugador,element.idTablero,element.idNum));
+                    TableroFic.casillasTablero[element.idNum].tieneFicha=true;
+                    TableroFic.casillasTablero[element.idNum].colorFicha="negras";
                 }
     
             });
-            fichasNegras.forEach(element => {
-                TableroFic.fichasNegras.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
-                TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
-                TableroFic.casillasTablero[element.casillaObjeto.id].colorFicha="negras";
-            });
+            for (let i = 0; i < this.fichasBlancas.length; i++) {
+                if(this.fichasBlancas[i].idTablero==casilla){
+                }
+                else{
+                    TableroFic.fichasBlancas.push(new FichaFic(this.fichasBlancas[i].jugador,this.fichasBlancas[i].idTablero,this.fichasBlancas[i].idNum));
+                    TableroFic.casillasTablero[this.fichasBlancas[i].idNum].tieneFicha=true;
+                    TableroFic.casillasTablero[this.fichasBlancas[i].idNum].colorFicha="negras";
+    
+                }
+               
+           }
         }
         funcEval(){
             let arrayPesos=[1000,20,1]
@@ -1750,9 +1752,7 @@ function create ()
 
         });
         for (let i = 0; i < fichasNegras.length; i++) {
-            console.log(i);
             if(fichasNegras[i].casillaObjeto.idTablero==casilla){
-                console.log("I need to know");
             }
             else{
                 TableroFic.fichasNegras.push(new FichaFic(fichasNegras[i].jugador,fichasNegras[i].casillaObjeto.idTablero,fichasNegras[i].casillaObjeto.id));
@@ -1834,7 +1834,10 @@ function create ()
     //  /      }
     //    });
     // console.log("El valor max para Blancas: "+max);
+       let tableroPruebaProfundidad2= new TableroFic();
        let indexTestPrueba=5;
        console.log(arrayTablerosFicBlancas[indexTestPrueba]);
-       console.log(arrayTablerosFicBlancas[indexTestPrueba].moves_Ficha_Func(arrayTablerosFicBlancas[indexTestPrueba].fichasNegras[1]))
+       arrayTablerosFicBlancas[indexTestPrueba].next_move_Negras_TableroFic(arrayTablerosFicBlancas[indexTestPrueba].fichasNegras[1],arrayTablerosFicBlancas[indexTestPrueba].moves_Ficha_Func(arrayTablerosFicBlancas[indexTestPrueba].fichasNegras[1])[0],tableroPruebaProfundidad2);
+       console.log(tableroPruebaProfundidad2);
+       console.log(tableroPruebaProfundidad2.funcEval());
 }
