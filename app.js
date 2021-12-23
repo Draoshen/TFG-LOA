@@ -169,8 +169,6 @@ function create ()
                             this.casillasTablero[fila*8+i]= new CasillaFic(colorBlancasTablero,false,fila*8+i,identificadoresTablero[fila*8+i]);
                         //casillas[i].setOrigin(0,0);
                         // console.log(casillas[i]);
-                        
-                    
                  }
                 
             }
@@ -706,6 +704,33 @@ function create ()
             }
             return fichasEnBordeBlancas;
         }
+
+
+        next_move_Negras_TableroFic(Ficha,casilla,TableroFic){
+            TableroFic.mapMoves.set(Ficha,casilla);
+            fichasBlancas.forEach(element => {
+                let fichaToAdd =new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id);
+                if(element===Ficha){
+                    if(true){
+                        
+                    }
+                    TableroFic.fichasBlancas.push(new FichaFic(element.jugador,casilla,map1.get(casilla)));
+                    TableroFic.casillasTablero[map1.get(casilla)].tieneFicha=true;
+                    TableroFic.casillasTablero[map1.get(casilla)].colorFicha="blancas";
+                }
+                else{
+                    TableroFic.fichasBlancas.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
+                    TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
+                    TableroFic.casillasTablero[element.casillaObjeto.id].colorFicha="blancas";
+                }
+    
+            });
+            fichasNegras.forEach(element => {
+                TableroFic.fichasNegras.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
+                TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
+                TableroFic.casillasTablero[element.casillaObjeto.id].colorFicha="negras";
+            });
+        }
         funcEval(){
             let arrayPesos=[1000,20,1]
             let peso=arrayPesos[0]*(this.concentracionBlancas()-this.concentracionNegras())+arrayPesos[1]*(this.fichasEnBordeBlancas()-this.fichasEnBordeNegras())+this.distancia_centrTablero_CdM_Blancas()-this.distancia_centrTablero_CdM_Negras()+Math.random();
@@ -953,7 +978,7 @@ function create ()
                 }
             }
             else{
-                let arrayBlancas=["7b","7d","2e","3h"];
+                let arrayBlancas=["7b","7d","2e","3h","8d"];
                 for (let index = 0; index < arrayBlancas.length; index++) {
                      fichasBlancas[index]=(new fichaTablero(casillas[map1.get(arrayBlancas[index])],"blancas",escena,casillasBoard[map1.get(arrayBlancas[index])]));   
                 }
@@ -1712,6 +1737,7 @@ function create ()
         fichasBlancas.forEach(element => {
             let fichaToAdd =new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id);
             if(element===Ficha){
+
                 TableroFic.fichasBlancas.push(new FichaFic(element.jugador,casilla,map1.get(casilla)));
                 TableroFic.casillasTablero[map1.get(casilla)].tieneFicha=true;
                 TableroFic.casillasTablero[map1.get(casilla)].colorFicha="blancas";
@@ -1723,12 +1749,21 @@ function create ()
             }
 
         });
-        fichasNegras.forEach(element => {
-            TableroFic.fichasNegras.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
-            TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
-            TableroFic.casillasTablero[element.casillaObjeto.id].colorFicha="negras";
-        });
+        for (let i = 0; i < fichasNegras.length; i++) {
+            console.log(i);
+            if(fichasNegras[i].casillaObjeto.idTablero==casilla){
+                console.log("I need to know");
+            }
+            else{
+                TableroFic.fichasNegras.push(new FichaFic(fichasNegras[i].jugador,fichasNegras[i].casillaObjeto.idTablero,fichasNegras[i].casillaObjeto.id));
+                TableroFic.casillasTablero[fichasNegras[i].casillaObjeto.id].tieneFicha=true;
+                TableroFic.casillasTablero[fichasNegras[i].casillaObjeto.id].colorFicha="negras";
+
+            }
+           
+       }
     }
+
     function conversorTableroFic(TableroFic){
         fichasBlancas.forEach(element => {
             TableroFic.fichasBlancas.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
