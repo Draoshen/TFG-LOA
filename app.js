@@ -1831,7 +1831,7 @@ function create ()
     //        if(element.funcEval()>max){
     //             max=element.funcEval();
     //             console.log(element.mapMoves);
-    //        }
+    //  /      }
     //    });
     // console.log("El valor max para Blancas: "+max);
        let indexTestPrueba=5;
