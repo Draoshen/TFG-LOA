@@ -1,23 +1,14 @@
 class Tree {
     constructor(val) {
       this.val = val;
-      this.valEval;
-      // I've chosen to use an array for ease of
-      // use, though a Linked List may be more
-      // appropriate if you anticipate deleting 
-      // nodes often
+      this.valEval=null;
+      this.tableroFic=null;
       this.children = [];
     }
     
     addChild(val) {
-      // Create a new Tree from the given value
       const node = new Tree(val);
-      
-      // Add the node to the operating node's (this)
-      // children array
       this.children.push(node);
-      
-      // Return the node
       return node;
     }
     

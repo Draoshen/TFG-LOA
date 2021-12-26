@@ -39,6 +39,7 @@ let casillasBoard = [];
 let CasillasLimites=[];
 let casillasHighlighted=[];
 let fichaSeleccionada=null;
+let casillaSeleccionada=null;
 let fichasNegras = [];
 let identificadoresTablero=[];
 let turnoPartida=true;
@@ -64,6 +65,7 @@ for (let i = 0; i < numFilas; i++) {
     }
     
 }
+const jugadorVSjugador = false;
 function preload ()
 {
     //this.load.setBaseURL('http://labs.phaser.io');
@@ -98,9 +100,12 @@ function create ()
                 this.fichaCanvas=gameScene.add.circle(casillaObjeto.posX, casillaObjeto.posY, 40, colorFichasNegras).setInteractive();
             }
                 this.fichaCanvas.on('pointerdown', function() {
-                if (turnoPartida==true && jugador=="blancas" && partidaAcabada==false) {
+                if (turnoPartida==true && jugador=="blancas" && partidaAcabada==false && jugadorVSjugador) {
                     if (fichaSeleccionada!=null) {
                         fichaSeleccionada.setStrokeStyle(0,0x000000);
+                    }
+                    if (casillaSeleccionada!=null) {
+                        casillaSeleccionada.setStrokeStyle(0,0x000000)
                     }
                     fichaSeleccionada=Ficha.fichaCanvas;
                     Ficha.fichaCanvas.setStrokeStyle(4,0xE5E228);
@@ -111,6 +116,9 @@ function create ()
                 if (turnoPartida==false &&jugador==="negras" && partidaAcabada==false) {
                     if (fichaSeleccionada!=null) {
                         fichaSeleccionada.setStrokeStyle(0,0x000000);
+                    }
+                    if (casillaSeleccionada!=null) {
+                        casillaSeleccionada.setStrokeStyle(0,0x000000)
                     }
                     fichaSeleccionada=Ficha.fichaCanvas;
                     Ficha.fichaCanvas.setStrokeStyle(4,0xE5E228);
@@ -129,6 +137,13 @@ function create ()
                          });
 
         } 
+      }
+      class MovementFichaFic {
+          constructor(FichaFic,casilla){
+              this.FichaFic= FichaFic;
+              this.casillaFicha=FichaFic.idTablero;
+              this.to_casilla=casilla;
+          }
       }
       class TableroFic{
         
@@ -773,7 +788,7 @@ function create ()
         all_next_moves_TableroFic(){
             if (this.turno=="blancas") {
                 let arrayTablerosFicBlancas=[];
-                console.log("Se van a procesar todos los movimientos para las BLANCAS");
+                //console.log("Se van a procesar todos los movimientos para las BLANCAS");
                 for (let j = 0,contador=0; j < this.fichasBlancas.length; j++) {
                     for (let i = 0; i < this.moves_Ficha_Func(this.fichasBlancas[j]).length; i++) {
                         arrayTablerosFicBlancas.push(new TableroFic());
@@ -785,7 +800,7 @@ function create ()
             }
             else{
                 let arrayTablerosFicNegras=[];
-                console.log("Se van a procesar todos los movimientos para las NEGRAS");
+                //console.log("Se van a procesar todos los movimientos para las NEGRAS");
                 for (let j = 0,contador=0; j < this.fichasNegras.length; j++) {
                     for (let i = 0; i < this.moves_Ficha_Func(this.fichasNegras[j]).length; i++) {
                         arrayTablerosFicNegras.push(new TableroFic());
@@ -1626,6 +1641,9 @@ function create ()
                     });
                     terminarPartidaNegras();
                     terminarPartidaBlancas();
+                    if (!jugadorVSjugador && !partidaAcabada) {
+                        moveAI();
+                    }
                 });
                 // posiblesMoves[indexMoves].setInteractive().on('pointerup',function(){
                 //     Ficha.casillaObjeto.tieneFicha=false;
@@ -1840,28 +1858,6 @@ function create ()
         });
         return TableroFic;
     }
-        //pintarBordeTablero();
-    //    identificadoresTablero.forEach(element => {
-    //        console.log(element);
-    //    }); 
-        casillasBoard.forEach(element => {
-            //console.log(element);
-        });
-        /*this.input.on('pointerdown', function(pointer){
-            var touchX = pointer.x;
-            var touchY = pointer.y;
-            console.log("Estás clickando en: "+touchX);
-            console.log("Estás clickando en Y: "+touchY);
-            // ...
-         });
-         */
-        
-    
-    //emitter.startFollow(logo);
-    let indexPrueba =map1.get("4e");
-    let posiblesMoves=[];
-    let indexMoves=0;
-    let activated=false;
 
        let a = gameScene.add.rectangle(900,900,ladoCasilla,ladoCasilla,0x9172AC).setInteractive();
        a.on('pointerup',function() {
@@ -1874,85 +1870,74 @@ function create ()
             //  distanciaMediaEquipoNegras();
             //  casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
             //  console.log(centroDeMasaBlancas);
-             console.log(funcEval());
+             console.log(getBestMoveDepth2());
              //console.log(moves_blancas());
         //    console.log("Blancas: "+fichasBlancas.length);
        });
 
-       let tableroPrueba2 = new TableroFic();
-       let arrayTablerosProfundidad1= [];
-       let arrayTablerosProfundidad2= [];
-       let arrayTablerosProfundidad3= [];
-       let arrayTablerosProfundidad4=[];
-       for (let j = 0,contador=0; j < fichasBlancas.length; j++) {
-            for (let i = 0; i < moves_Ficha_Func(fichasBlancas[j]).length; i++) {
-                arrayTablerosProfundidad1.push(new TableroFic());
-                next_move_Blancas_TableroFic(fichasBlancas[j],moves_Ficha_Func(fichasBlancas[j])[i],arrayTablerosProfundidad1[contador]);
-                contador++;
-            }
-       }
-       arrayTablerosProfundidad1.forEach(element => {
-           arrayTablerosProfundidad2.push(element.all_next_moves_TableroFic());
-       });
     //    arrayTablerosProfundidad2.forEach(element => {
     //         element.forEach(arrayInside =>{
     //             arrayTablerosProfundidad3.push(arrayInside.all_next_moves_TableroFic());
     //         });
     //     }); 
+        function updateArrayTablerosProfundidad1(arrayTablerosProfundidad1){
+            for (let j = 0,contador=0; j < fichasBlancas.length; j++) {
+                for (let i = 0; i < moves_Ficha_Func(fichasBlancas[j]).length; i++) {
+                    arrayTablerosProfundidad1.push(new TableroFic());
+                    next_move_Blancas_TableroFic(fichasBlancas[j],moves_Ficha_Func(fichasBlancas[j])[i],arrayTablerosProfundidad1[contador]);
+                    contador++;
+                }
+           }
+        }
 
-        function getBestMoveDepth3(){
-            let arrayToReturn=new Map();
-            let alpha=0; 
-            let beta=0;
-            alpha=Number.NEGATIVE_INFINITY,
-            beta=Number.POSITIVE_INFINITY,
-            arrayTablerosProfundidad3.forEach(arrayInside => {
-                arrayInside.forEach(element =>{
-                    if(element.funcEval()<beta){
-                        beta=element.funcEval();
-                        arrayToReturn=new Map().set(arrayInside,element);
+        function updateArrayTablerosProfundidad2(arrayTablerosProfundidad1,arrayTablerosProfundidad2){
+            arrayTablerosProfundidad1.forEach(element => {
+                arrayTablerosProfundidad2.push(element.all_next_moves_TableroFic());
+            });
+        }
+        function getBestMoveDepth2(){
+            let arrayTablerosProfundidad1= [];
+            updateArrayTablerosProfundidad1(arrayTablerosProfundidad1);
+            let arrayTablerosProfundidad2=[];
+            updateArrayTablerosProfundidad2(arrayTablerosProfundidad1,arrayTablerosProfundidad2);
+            
+            let arrayTablerosProfundidad3= [];
+            let arrayTablerosProfundidad4=[];
+
+            let treePrueba= new Tree("Move Blancas");
+            arrayTablerosProfundidad1.forEach(element =>{
+                treePrueba.addChild(element);
+            });
+            for (let i = 0; i < arrayTablerosProfundidad1.length; i++) {
+                    arrayTablerosProfundidad2[i].forEach(element => {
+                        treePrueba.children[i].addChild(element);
+                    });
+            }
+            for (let index = 0; index < treePrueba.children.length; index++) {
+                let min=Number.POSITIVE_INFINITY;
+                treePrueba.children[index].children.forEach(element => {
+                    let valor_funcEval=element.val.funcEval();
+                    if (valor_funcEval<min) {
+                        min=valor_funcEval;
+                        treePrueba.children[index].valEval=valor_funcEval;
+                        treePrueba.children[index].TableroFic=element.val
                     }
                 })
-            })
-            return arrayToReturn;
-        }
-        // const tree = new Tree("Estado Actual del Tablero");
-        // arrayTablerosProfundidad1.forEach(element =>{
-        //     tree.createChildNode(element);
-        // });
-        let mapMiniVal = new Map();
-        const treePrueba= new Tree("Move Blancas");
-        arrayTablerosProfundidad1.forEach(element =>{
-            treePrueba.addChild(element);
-        });
-        for (let i = 0; i < arrayTablerosProfundidad1.length; i++) {
-                arrayTablerosProfundidad2[i].forEach(element => {
-                    treePrueba.children[i].addChild(element);
-                });
-        }
-        for (let index = 0; index < treePrueba.children.length; index++) {
-            let min=Number.POSITIVE_INFINITY;
-            treePrueba.children[index].children.forEach(element => {
-                let valor_funcEval=element.val.funcEval();
-                if (valor_funcEval<min) {
-                    min=valor_funcEval;
-                    treePrueba.children[index].valEval=valor_funcEval;
-                    treePrueba.children[index].TableroFic=element.val
-                }
-            })
-        }
-    
-        let max=Number.NEGATIVE_INFINITY;
-        treePrueba.children.forEach(element =>{
-            if (element.valEval>max) {
-                treePrueba.valEval=element.valEval;
-                treePrueba.tableroFic=element.TableroFic;
-                max=element.valEval;
             }
-        });
-
-        console.log(treePrueba);
-        console.log();
+        
+            let max=Number.NEGATIVE_INFINITY;
+            treePrueba.children.forEach(element =>{
+                if (element.valEval>max) {
+                    treePrueba.valEval=element.valEval;
+                    treePrueba.tableroFic=element.TableroFic;
+                    max=element.valEval;
+                }
+            });
+            const iterator1 = treePrueba.tableroFic.mapMovePrimigenio;
+            console.log();
+            let nextMove =new MovementFichaFic(iterator1.keys().next().value,iterator1.values().next().value);
+            return nextMove;
+        }
         //----------------Si quieres más de profundidad 3 descomenta
         // arrayTablerosProfundidad3.forEach(element => {
         //     element.forEach(arrayInside =>{
@@ -1961,22 +1946,50 @@ function create ()
                
         //     });
         // });
-    //   console.log(arrayTablerosFicBlancas);
-    //    next_move_Blancas_TableroFic(fichasBlancas[0],moves_Ficha_Func(fichasBlancas[0])[1],tableroPrueba2);
-    //    let max=-999999999;
-    //    arrayTablerosFicBlancas.forEach(element => {
-    //        console.log(element.funcEval());
-    //        if(element.funcEval()>max){
-    //             max=element.funcEval();
-    //             console.log(element.mapMoves);
-    //  /      }
-    //    });
-    // console.log("El valor max para Blancas: "+max);
-       let tableroPruebaProfundidad2= new TableroFic();
-       let tableroPruebaProfundidad3= new TableroFic();
-       
+        // sleep time expects milliseconds
+        setTimeout(() => {
 
-       let indexTestPrueba=5;
+            
+            console.log("World!"); }, 2000);
+
+        if (!jugadorVSjugador) {
+            console.log("Are you ready for the challenge ?");
+        }
+        function moveAI(){
+            if (!jugadorVSjugador) {
+                let posX=0;
+                let posY=0;
+                let movement =getBestMoveDepth2();
+                let indexFichaToMove=fichasBlancas.indexOf(getFichaByIdBoard(movement.casillaFicha));
+                let indexFicha_comida=fichasNegras.indexOf(getFichaByIdBoard(movement.to_casilla));
+                if (fichasBlancas[indexFichaToMove]!=null) {
+                    posX=fichasBlancas[indexFichaToMove].fichaPosX;
+                    posY=fichasBlancas[indexFichaToMove].fichaPosY;
+                    fichasBlancas[indexFichaToMove].fichaCanvas.destroy();
+                    fichasBlancas[indexFichaToMove].casillaObjeto.tieneFicha=false;
+                    fichasBlancas[indexFichaToMove].casilla=null;
+                }
+                if (fichasNegras[indexFicha_comida]!=null) {
+                    fichasNegras[indexFicha_comida].fichaCanvas.destroy();
+                    fichasNegras[indexFicha_comida].casillaObjeto.tieneFicha=false;
+                    fichasNegras[indexFicha_comida].casilla=null;
+                }
+                let Ficha=new fichaTablero(casillas[map1.get(movement.to_casilla)],"blancas",gameScene,casillasBoard[map1.get(movement.to_casilla)]);
+                fichaSeleccionada=Ficha.fichaCanvas;
+                fichaSeleccionada.setStrokeStyle(4,0xE5E228);
+                console.log(fichasBlancas);
+                casillaSeleccionada=gameScene.add.rectangle(posX,posY,ladoCasilla,ladoCasilla);
+                casillaSeleccionada.setStrokeStyle(4,0xAF4054);
+                fichasBlancas.push(Ficha);
+                turnoPartida=false;
+                reciclar(fichasNegras);
+                reciclar(fichasBlancas);
+                terminarPartidaNegras();
+                terminarPartidaBlancas();
+            }
+        }
+        moveAI();
+        let indexTestPrueba=5;
 
     //    console.log(arrayTablerosProfundidad1);
     //    console.log(arrayTablerosProfundidad2);
