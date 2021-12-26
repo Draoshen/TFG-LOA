@@ -137,9 +137,12 @@ function create ()
             this.centroDeMasaBlancas= new CentroDeMasas();
             const letrasTablero=["a","b","c","d","e","f","g","h"];
             this.mapMoves= new Map();
+            this.mapMovePrimigenio= new Map();
             this.casillasTablero=[];
             this.fichasBlancas=[];
             this.fichasNegras=[];
+            this.turno;
+            this.profundidad;
             let fichaLimite=false;
             let tocaCambiarFila=false;
             for (let fila = 0; fila <8; fila++) {
@@ -707,6 +710,9 @@ function create ()
 
 
         next_move_Negras_TableroFic(Ficha,casilla,TableroFic){
+            TableroFic.turno="blancas"
+            TableroFic.profundidad=this.profundidad+1;
+            TableroFic.mapMovePrimigenio=this.mapMovePrimigenio;
             TableroFic.mapMoves.set(Ficha,casilla);
             this.fichasNegras.forEach(element => {
                 if(element===Ficha){
@@ -734,6 +740,9 @@ function create ()
            }
         }
         next_move_Blancas_TableroFic(Ficha,casilla,TableroFic){
+            TableroFic.turno="negras"
+            TableroFic.profundidad=this.profundidad+1;
+            TableroFic.mapMovePrimigenio=this.mapMovePrimigenio;
             TableroFic.mapMoves.set(Ficha,casilla);
             this.fichasBlancas.forEach(element => {
                 if(element===Ficha){
@@ -752,6 +761,7 @@ function create ()
                 if(this.fichasNegras[i].idTablero==casilla){
                 }
                 else{
+
                     TableroFic.fichasNegras.push(new FichaFic(this.fichasNegras[i].jugador,this.fichasNegras[i].idTablero,this.fichasNegras[i].idNum));
                     TableroFic.casillasTablero[this.fichasNegras[i].idNum].tieneFicha=true;
                     TableroFic.casillasTablero[this.fichasNegras[i].idNum].colorFicha="negras";
@@ -760,8 +770,35 @@ function create ()
                
            }
         }
+        all_next_moves_TableroFic(){
+            if (this.turno=="blancas") {
+                let arrayTablerosFicBlancas=[];
+                console.log("Se van a procesar todos los movimientos para las BLANCAS");
+                for (let j = 0,contador=0; j < this.fichasBlancas.length; j++) {
+                    for (let i = 0; i < this.moves_Ficha_Func(this.fichasBlancas[j]).length; i++) {
+                        arrayTablerosFicBlancas.push(new TableroFic());
+                        this.next_move_Blancas_TableroFic(this.fichasBlancas[j],this.moves_Ficha_Func(this.fichasBlancas[j])[i],arrayTablerosFicBlancas[contador]);
+                        contador++;
+                    }
+               }
+               return arrayTablerosFicBlancas;
+            }
+            else{
+                let arrayTablerosFicNegras=[];
+                console.log("Se van a procesar todos los movimientos para las NEGRAS");
+                for (let j = 0,contador=0; j < this.fichasNegras.length; j++) {
+                    for (let i = 0; i < this.moves_Ficha_Func(this.fichasNegras[j]).length; i++) {
+                        arrayTablerosFicNegras.push(new TableroFic());
+                        this.next_move_Negras_TableroFic(this.fichasNegras[j],this.moves_Ficha_Func(this.fichasNegras[j])[i],arrayTablerosFicNegras[contador]);
+                        contador++;
+                    }
+               }
+               return arrayTablerosFicNegras;
+            }
+        }
+
         funcEval(){
-            let arrayPesos=[1000,20,1]
+            let arrayPesos=[1000,20,1];
             let peso=arrayPesos[0]*(this.concentracionBlancas()-this.concentracionNegras())+arrayPesos[1]*(this.fichasEnBordeBlancas()-this.fichasEnBordeNegras())+this.distancia_centrTablero_CdM_Blancas()-this.distancia_centrTablero_CdM_Negras()+Math.random();
             return peso;
         }
@@ -1762,11 +1799,12 @@ function create ()
 
     }
     function next_move_Blancas_TableroFic(Ficha,casilla,TableroFic){
-        TableroFic.mapMoves.set(Ficha,casilla);
+        TableroFic.turno="negras";
+        TableroFic.profundidad=1;
+        TableroFic.mapMovePrimigenio.set(new FichaFic(Ficha.jugador,Ficha.casillaObjeto.idTablero,Ficha.casillaObjeto.id),casilla);
         fichasBlancas.forEach(element => {
-            let fichaToAdd =new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id);
             if(element===Ficha){
-
+                TableroFic.mapMoves.set(new FichaFic(Ficha.jugador,Ficha.casillaObjeto.idTablero,Ficha.casillaObjeto.id),casilla);
                 TableroFic.fichasBlancas.push(new FichaFic(element.jugador,casilla,map1.get(casilla)));
                 TableroFic.casillasTablero[map1.get(casilla)].tieneFicha=true;
                 TableroFic.casillasTablero[map1.get(casilla)].colorFicha="blancas";
@@ -1842,14 +1880,87 @@ function create ()
        });
 
        let tableroPrueba2 = new TableroFic();
-       let arrayTablerosFicBlancas= [];
+       let arrayTablerosProfundidad1= [];
+       let arrayTablerosProfundidad2= [];
+       let arrayTablerosProfundidad3= [];
+       let arrayTablerosProfundidad4=[];
        for (let j = 0,contador=0; j < fichasBlancas.length; j++) {
             for (let i = 0; i < moves_Ficha_Func(fichasBlancas[j]).length; i++) {
-                arrayTablerosFicBlancas.push(new TableroFic());
-                next_move_Blancas_TableroFic(fichasBlancas[j],moves_Ficha_Func(fichasBlancas[j])[i],arrayTablerosFicBlancas[contador]);
+                arrayTablerosProfundidad1.push(new TableroFic());
+                next_move_Blancas_TableroFic(fichasBlancas[j],moves_Ficha_Func(fichasBlancas[j])[i],arrayTablerosProfundidad1[contador]);
                 contador++;
             }
        }
+       arrayTablerosProfundidad1.forEach(element => {
+           arrayTablerosProfundidad2.push(element.all_next_moves_TableroFic());
+       });
+    //    arrayTablerosProfundidad2.forEach(element => {
+    //         element.forEach(arrayInside =>{
+    //             arrayTablerosProfundidad3.push(arrayInside.all_next_moves_TableroFic());
+    //         });
+    //     }); 
+
+        function getBestMoveDepth3(){
+            let arrayToReturn=new Map();
+            let alpha=0; 
+            let beta=0;
+            alpha=Number.NEGATIVE_INFINITY,
+            beta=Number.POSITIVE_INFINITY,
+            arrayTablerosProfundidad3.forEach(arrayInside => {
+                arrayInside.forEach(element =>{
+                    if(element.funcEval()<beta){
+                        beta=element.funcEval();
+                        arrayToReturn=new Map().set(arrayInside,element);
+                    }
+                })
+            })
+            return arrayToReturn;
+        }
+        // const tree = new Tree("Estado Actual del Tablero");
+        // arrayTablerosProfundidad1.forEach(element =>{
+        //     tree.createChildNode(element);
+        // });
+        let mapMiniVal = new Map();
+        const treePrueba= new Tree("Move Blancas");
+        arrayTablerosProfundidad1.forEach(element =>{
+            treePrueba.addChild(element);
+        });
+        for (let i = 0; i < arrayTablerosProfundidad1.length; i++) {
+                arrayTablerosProfundidad2[i].forEach(element => {
+                    treePrueba.children[i].addChild(element);
+                });
+        }
+        for (let index = 0; index < treePrueba.children.length; index++) {
+            let min=Number.POSITIVE_INFINITY;
+            treePrueba.children[index].children.forEach(element => {
+                let valor_funcEval=element.val.funcEval();
+                if (valor_funcEval<min) {
+                    min=valor_funcEval;
+                    treePrueba.children[index].valEval=valor_funcEval;
+                    treePrueba.children[index].TableroFic=element.val
+                }
+            })
+        }
+    
+        let max=Number.NEGATIVE_INFINITY;
+        treePrueba.children.forEach(element =>{
+            if (element.valEval>max) {
+                treePrueba.valEval=element.valEval;
+                treePrueba.tableroFic=element.TableroFic;
+                max=element.valEval;
+            }
+        });
+
+        console.log(treePrueba);
+        console.log();
+        //----------------Si quieres más de profundidad 3 descomenta
+        // arrayTablerosProfundidad3.forEach(element => {
+        //     element.forEach(arrayInside =>{
+                
+        //             arrayTablerosProfundidad4.push(arrayInside.all_next_moves_TableroFic());
+               
+        //     });
+        // });
     //   console.log(arrayTablerosFicBlancas);
     //    next_move_Blancas_TableroFic(fichasBlancas[0],moves_Ficha_Func(fichasBlancas[0])[1],tableroPrueba2);
     //    let max=-999999999;
@@ -1863,11 +1974,21 @@ function create ()
     // console.log("El valor max para Blancas: "+max);
        let tableroPruebaProfundidad2= new TableroFic();
        let tableroPruebaProfundidad3= new TableroFic();
+       
+
        let indexTestPrueba=5;
-       console.log(arrayTablerosFicBlancas[indexTestPrueba]);
-       arrayTablerosFicBlancas[indexTestPrueba].next_move_Negras_TableroFic(arrayTablerosFicBlancas[indexTestPrueba].fichasNegras[1],arrayTablerosFicBlancas[indexTestPrueba].moves_Ficha_Func(arrayTablerosFicBlancas[indexTestPrueba].fichasNegras[1])[0],tableroPruebaProfundidad2);
-       console.log(tableroPruebaProfundidad2);
-       console.log(tableroPruebaProfundidad2.next_move_Blancas_TableroFic(tableroPruebaProfundidad2.fichasBlancas[0],tableroPruebaProfundidad2.moves_Ficha_Func(tableroPruebaProfundidad2.fichasBlancas[0])[0],tableroPruebaProfundidad3));
-       console.log(tableroPruebaProfundidad3);
-       console.log(tableroPruebaProfundidad3.funcEval());
+
+    //    console.log(arrayTablerosProfundidad1);
+    //    console.log(arrayTablerosProfundidad2);
+    //    console.log(arrayTablerosProfundidad3);
+    //    console.log(getBestMoveDepth3());
+    //    console.log(arrayTablerosFicBlancas[indexTestPrueba].mapMoves);
+    //    arrayTablerosFicBlancas[indexTestPrueba].next_move_Negras_TableroFic(arrayTablerosFicBlancas[indexTestPrueba].fichasNegras[1],arrayTablerosFicBlancas[indexTestPrueba].moves_Ficha_Func(arrayTablerosFicBlancas[indexTestPrueba].fichasNegras[1])[0],tableroPruebaProfundidad2);
+    //    console.log(tableroPruebaProfundidad2.mapMoves);
+    //    console.log(tableroPruebaProfundidad2.next_move_Blancas_TableroFic(tableroPruebaProfundidad2.fichasBlancas[0],tableroPruebaProfundidad2.moves_Ficha_Func(tableroPruebaProfundidad2.fichasBlancas[0])[0],tableroPruebaProfundidad3));
+    //    arrayTablerosProfundidad3= tableroPruebaProfundidad2.all_next_moves_TableroFic();
+    //    console.log(arrayTablerosProfundidad3[0].mapMoves);
+    //    console.log(arrayTablerosProfundidad3[0].all_next_moves_TableroFic());
+    //    console.log(tableroPruebaProfundidad3);
+    //    console.log(tableroPruebaProfundidad3.funcEval());
 }
