@@ -44,7 +44,7 @@ let fichasNegras = [];
 let identificadoresTablero=[];
 let turnoPartida=false;
 let partidaAcabada=false;
-let defaultBoard=true;
+let defaultBoard=false;
 const colorFichasNegras = 0x3B292C;
 const colorFichasBlancas = 0x964C3E;
 const colorFichasPruebas= 0x44327E;
@@ -534,7 +534,7 @@ function create ()
             let colorContrario=this.oppositeColor(Ficha);
             if(indexLetrasCasilla-movesDiagonalesDescendente>=0 && idFichaFila+movesDiagonalesDescendente<=8){
                 for (let i = 1; i < movesDiagonalesDescendente && sePuedeMover; i++) {
-                    if(this.casillasTablero[map1.get((idFichaFila+i)+letrasTablero[indexLetrasCasilla-1])].colorFicha==colorContrario){
+                    if(this.casillasTablero[map1.get((idFichaFila+i)+letrasTablero[indexLetrasCasilla-i])].colorFicha==colorContrario){
                         sePuedeMover=false;
                     }                   
                     
@@ -1027,6 +1027,10 @@ function create ()
             }
             else{
                 let arrayNegras=["6c","3c","4d","6e","5f"];
+                //let arrayNegrasStaleMate=["7c","7g","5c","5g","4b","4d","4f","4h","3c","3g","1c","1g"];
+                // let arrayNegras=["6d","5e","4d","3e","2d"];
+                //let arrayNegrasImposibles2=["1f","2f","3f","1h","3g","3h"];
+                //let arrayNegrasImposibles=["1a","2a","3a","1b","1c","1d","1e","1f","1g","1g","1h","2h","3h"];
                 for (let index = 0; index < arrayNegras.length; index++) {
                      fichasNegras[index]=(new fichaTablero(casillas[map1.get(arrayNegras[index])],"negras",escena,casillasBoard[map1.get(arrayNegras[index])]));   
                 }
@@ -1057,7 +1061,11 @@ function create ()
                 }
             }
             else{
+                //let arrayBlancasStalemate=["7e","6b","6d","6f","6h","5e","3e","2b","2d","2f","2h","1e"];
                 let arrayBlancas=["7b","7d","2e","3h","8d"];
+                //let arrayBlancasImposibles2=["1g","2g","2h"];
+                //let arrayBlancasImposibles=["6e","5d","4e","3d","2e"];
+                
                 for (let index = 0; index < arrayBlancas.length; index++) {
                      fichasBlancas[index]=(new fichaTablero(casillas[map1.get(arrayBlancas[index])],"blancas",escena,casillasBoard[map1.get(arrayBlancas[index])]));   
                 }
@@ -1496,8 +1504,10 @@ function create ()
             let sePuedeMover=true;
             let colorContrario=oppositeColor(Ficha);
             if(indexLetrasCasilla-movesDiagonalesDescendente>=0 && idFichaFila+movesDiagonalesDescendente<=8){
+
                 for (let i = 1; i < movesDiagonalesDescendente && sePuedeMover; i++) {
-                    if(casillasBoard[getCasillaObjetoById((idFichaFila+i)+letrasTablero[indexLetrasCasilla-1])].tieneFicha==colorContrario){
+
+                    if(casillasBoard[getCasillaObjetoById((idFichaFila+i)+letrasTablero[indexLetrasCasilla-i])].tieneFicha==colorContrario){
                         sePuedeMover=false;
                     }                   
                     
@@ -1975,7 +1985,6 @@ function create ()
                 let Ficha=new fichaTablero(casillas[map1.get(movement.to_casilla)],"blancas",gameScene,casillasBoard[map1.get(movement.to_casilla)]);
                 fichaSeleccionada=Ficha.fichaCanvas;
                 fichaSeleccionada.setStrokeStyle(4,0xE5E228);
-                console.log(fichasBlancas);
                 casillaSeleccionada=gameScene.add.rectangle(posX,posY,ladoCasilla,ladoCasilla);
                 casillaSeleccionada.setStrokeStyle(4,0xAF4054);
                 fichasBlancas.push(Ficha);
@@ -1988,7 +1997,6 @@ function create ()
         }
         moveAI();
         let indexTestPrueba=5;
-
     //    console.log(arrayTablerosProfundidad1);
     //    console.log(arrayTablerosProfundidad2);
     //    console.log(arrayTablerosProfundidad3);
