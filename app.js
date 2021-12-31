@@ -42,7 +42,7 @@ let fichaSeleccionada=null;
 let casillaSeleccionada=null;
 let fichasNegras = [];
 let identificadoresTablero=[];
-let turnoPartida=true;
+let turnoPartida=false;
 let partidaAcabada=false;
 let defaultBoard=true;
 const colorFichasNegras = 0x3B292C;
@@ -1002,7 +1002,6 @@ function create ()
 
 
         function colocarFichasNegras(){
-            defaultBoard=false;
             if(defaultBoard){
                 let i=0;
                 var positionX;
@@ -1035,7 +1034,6 @@ function create ()
             }
         }
         function colocarFichasBlancas(){
-            defaultBoard=false;
             if (defaultBoard) {
                 var positionX;
                 var positionY;
@@ -1859,21 +1857,21 @@ function create ()
         return TableroFic;
     }
 
-       let a = gameScene.add.rectangle(900,900,ladoCasilla,ladoCasilla,0x9172AC).setInteractive();
-       a.on('pointerup',function() {
-           //a.destroy();
-           casillasHighlighted.forEach(element =>{
-               element.destroy();
-           });
-            //  centroDeMasasNegrasFunc();
-            //  centroDeMasasBlancasFunc();
-            //  distanciaMediaEquipoNegras();
-            //  casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
-            //  console.log(centroDeMasaBlancas);
-             console.log(getBestMoveDepth2());
-             //console.log(moves_blancas());
-        //    console.log("Blancas: "+fichasBlancas.length);
-       });
+    //    let a = gameScene.add.rectangle(900,900,ladoCasilla,ladoCasilla,0x9172AC).setInteractive();
+    //    a.on('pointerup',function() {
+    //        //a.destroy();
+    //        casillasHighlighted.forEach(element =>{
+    //            element.destroy();
+    //        });
+    //         //  centroDeMasasNegrasFunc();
+    //         //  centroDeMasasBlancasFunc();
+    //         //  distanciaMediaEquipoNegras();
+    //         //  casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
+    //         //  console.log(centroDeMasaBlancas);
+    //          console.log(getBestMoveDepth2());
+    //          //console.log(moves_blancas());
+    //     //    console.log("Blancas: "+fichasBlancas.length);
+    //    });
 
     //    arrayTablerosProfundidad2.forEach(element => {
     //         element.forEach(arrayInside =>{
@@ -1956,7 +1954,7 @@ function create ()
             console.log("Are you ready for the challenge ?");
         }
         function moveAI(){
-            if (!jugadorVSjugador) {
+            if (!jugadorVSjugador && turnoPartida==true) {
                 let posX=0;
                 let posY=0;
                 let movement =getBestMoveDepth2();
