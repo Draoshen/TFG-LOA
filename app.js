@@ -65,7 +65,7 @@ for (let i = 0; i < numFilas; i++) {
     }
     
 }
-const jugadorVSjugador = false;
+const jugadorVSjugador = true;
 function preload ()
 {
     //this.load.setBaseURL('http://labs.phaser.io');
@@ -812,9 +812,116 @@ function create ()
             }
         }
 
+    
+
+        getFichaByIdBoard(idTablero1){
+
+            for (let i = 0; i < this.fichasNegras.length; i++) {
+                if (""+this.fichasNegras[i].idTablero===""+idTablero1){
+                    return this.fichasNegras[i];//return element
+                }
+                
+            }
+            for (let i = 0; i < this.fichasBlancas.length; i++) {
+                if (""+this.fichasBlancas[i].idTablero===""+idTablero1){
+                    return this.fichasBlancas[i];//return element
+                }
+                
+            }
+        }
+
+        fichasDeAlrededor(Ficha){
+            let fichasDeAlrededor=[];
+            let idFichaFila=parseInt(Ficha.idTablero.split("")[0]);
+            let idFichaColumna=Ficha.idTablero.split("")[1];
+            let indexLetrasCasilla=letrasTablero.indexOf(idFichaColumna);
+            //Para las horizontales
+            this.HorizontalesFicha(Ficha).forEach(element =>{
+                if (element==idFichaFila+(letrasTablero[indexLetrasCasilla-1])) {
+                    fichasDeAlrededor.push(element);
+                }
+                if (element==idFichaFila+(letrasTablero[indexLetrasCasilla+1])) {
+                    fichasDeAlrededor.push(element);
+                }
+            });
+            this.VerticalesFicha(Ficha).forEach(element =>{
+                if (element==(idFichaFila-1)+letrasTablero[indexLetrasCasilla]) {
+                    fichasDeAlrededor.push(element);
+                }
+                if (element==(idFichaFila+1)+letrasTablero[indexLetrasCasilla]) {
+                    fichasDeAlrededor.push(element);
+                }
+            });
+            this.DiagonalDescendenteFicha(Ficha).forEach(element =>{
+                if (element==(idFichaFila+1)+letrasTablero[indexLetrasCasilla-1]) {
+                    fichasDeAlrededor.push(element);
+                }
+                if (element==(idFichaFila-1)+letrasTablero[indexLetrasCasilla+1]) {
+                    fichasDeAlrededor.push(element);
+                }
+            });
+            this.DiagonalAscendenteFicha(Ficha).forEach(element =>{
+                if (element==(idFichaFila+1)+letrasTablero[indexLetrasCasilla+1]) {
+                    fichasDeAlrededor.push(element);
+                }
+                if (element==(idFichaFila-1)+letrasTablero[indexLetrasCasilla-1]) {
+                    fichasDeAlrededor.push(element);
+                }
+            });
+            // fichasDeAlrededor.push(verticalesFicha(Ficha));
+            // fichasDeAlrededor.push(DiagonalAscendenteFicha(Ficha));
+            // fichasDeAlrededor.push(DiagonalDescendenteFicha(Ficha));
+            return fichasDeAlrededor;
+        }
+
+
+        fichasConectadas(Ficha){
+            //getFichaByCasilla();
+            let fichasConectadas =[];
+            fichasConectadas.push(Ficha.idTablero);
+            this.fichasConectadasRec(Ficha,Ficha.idTablero,fichasConectadas);
+            return fichasConectadas;
+        }
+        fichasConectadasRec(Ficha,idTablero,fichasConectadas){
+            this.fichasDeAlrededor(Ficha).forEach(element => {
+                if(this.casillasTablero[map1.get(element)].tieneFicha==Ficha.jugador && !fichasConectadas.includes(element) ){
+                    fichasConectadas.push(element);
+                    this.fichasConectadasRec(this.getFichaByIdBoard(element),element,fichasConectadas);
+                }
+                return fichasConectadas;
+            });
+            return fichasConectadas;
+        }
+
+        
+        gananNegras(){
+            let fichasConectadasCopy = this.fichasConectadas(this.fichasNegras[0]);
+            if (fichasConectadasCopy.length==this.fichasNegras.length) {
+                return Number.NEGATIVE_INFINITY;
+            }
+            else{
+                return 0;
+            }
+        }
+        gananBlancas(){
+            let fichasConectadasCopy = this.fichasConectadas(this.fichasBlancas[0]);
+            if (fichasConectadasCopy.length==this.fichasBlancas.length) {
+                return Number.POSITIVE_INFINITY;
+            }
+            else{
+                return 0;
+            }
+        }
         funcEval(){
+            let negrasGanan= this.gananNegras();
+            let blancasGanan=this.gananBlancas();
+
             let arrayPesos=[1000,20,1];
-            let peso=arrayPesos[0]*(this.concentracionBlancas()-this.concentracionNegras())+arrayPesos[1]*(this.fichasEnBordeBlancas()-this.fichasEnBordeNegras())+this.distancia_centrTablero_CdM_Blancas()-this.distancia_centrTablero_CdM_Negras()+Math.random();
+            let peso=arrayPesos[0]*(this.concentracionBlancas()
+            -this.concentracionNegras())+arrayPesos[1]*(this.fichasEnBordeBlancas()
+            -this.fichasEnBordeNegras())+this.distancia_centrTablero_CdM_Blancas()
+            -this.distancia_centrTablero_CdM_Negras()+Math.random()
+            + negrasGanan +blancasGanan ;
             return peso;
         }
     }
@@ -1026,7 +1133,13 @@ function create ()
                 }
             }
             else{
-                let arrayNegras=["6c","3c","4d","6e","5f"];
+                //let arrayNegras=["6c","3c","4d","6e","5f"];
+                let arrayNegras=["4e","3c","4d","6e","5f"];
+                //let arrayNegrasEjemplo=["6c","1g","3c","2g","3h"];
+                // let arrayNegras=["1c","1d","8b","8d","8e","8f","5d","5f","5g","4g","3g","3h"];
+                //let arrayNegras=["1g","2g","3h","6e","5f","1c","4d","3g"];
+                //let arrayNegrasBlock=["6g","5g","4g","3g","3b","1c","1d","3g"];
+                //let arrayNegrasEjemplo=["8d","8e","8f","7f","6g","5g","4f","6a","5b","4b","3b"];
                 //let arrayNegrasStaleMate=["7c","7g","5c","5g","4b","4d","4f","4h","3c","3g","1c","1g"];
                 // let arrayNegras=["6d","5e","4d","3e","2d"];
                 //let arrayNegrasImposibles2=["1f","2f","3f","1h","3g","3h"];
@@ -1061,8 +1174,13 @@ function create ()
                 }
             }
             else{
-                //let arrayBlancasStalemate=["7e","6b","6d","6f","6h","5e","3e","2b","2d","2f","2h","1e"];
                 let arrayBlancas=["7b","7d","2e","3h","8d"];
+                //let arrayBlancas=["6a","5a","4a","7c","5c","2c","7f","6f","2f","5h","4h"];
+                //let arrayBlancasMenosEsMas=["8e","6e","3a","4b","1g","4h","4d","1f"];
+                //let arrayBlancasStalemate=["7e","6b","6d","6f","6h","5e","3e","2b","2d","2f","2h","1e"];
+                //let arrayBlancasBloqueo=["7h","6h","5h","4h","3h", "7a","5a","4a","3e"];
+                //let arrayBlancasBlock=["1h","2h","2e","3h","8d"];
+                //let arrayBlancasEjemploCentro=["7e","6e","4e","6f","5f","4g","4h","6d","5d","4c"];
                 //let arrayBlancasImposibles2=["1g","2g","2h"];
                 //let arrayBlancasImposibles=["6e","5d","4e","3d","2e"];
                 
@@ -1695,6 +1813,7 @@ function create ()
             }
             centroDeMasaNegras.posX=Number((SumPosX/fichasNegras.length).toFixed(0));
             centroDeMasaNegras.posY=Number((SumPosY/fichasNegras.length).toFixed(0));
+            return centroDeMasaNegras;
         }
         function centroDeMasasBlancasFunc(){
             let SumPosX=0;
@@ -1706,6 +1825,7 @@ function create ()
             }
             centroDeMasaBlancas.posX=Number((SumPosX/fichasBlancas.length).toFixed(0));
             centroDeMasaBlancas.posY=Number((SumPosX/fichasBlancas.length).toFixed(0));
+            return centroDeMasaBlancas;
         }
         function distanciaMediaEquipoNegras(){
             let distanceMediaEquipo=0;
@@ -1816,13 +1936,42 @@ function create ()
             return val_x+val_y;
     }
     function funcEval(){
-        let arrayPesos=[1000,20,1]
-        let peso=arrayPesos[0]*(concentracionBlancas()-concentracionNegras())+arrayPesos[1]*(fichasEnBordeBlancas()-fichasEnBordeNegras())+distancia_centrTablero_CdM_Blancas()-distancia_centrTablero_CdM_Negras()+Math.random();
+        let negrasGanan= gananNegras();
+        let blancasGanan=gananBlancas();
+
+
+        let arrayPesos=[1000,20,1];
+
+
+        let peso=arrayPesos[0]*(concentracionBlancas()-concentracionNegras())
+        +arrayPesos[1]*(fichasEnBordeBlancas()
+        -fichasEnBordeNegras())+distancia_centrTablero_CdM_Blancas()
+        -distancia_centrTablero_CdM_Negras()+Math.random()+blancasGanan+negrasGanan;
+        
         return peso;
     }
     function Is_next_move_eating(casilla){
         let comer=false;
 
+    }
+    function gananNegras(){
+
+        let fichasConectadasCopy = fichasConectadas(fichasNegras[0]);
+        if (fichasConectadasCopy.length==fichasNegras.length) {
+            return Number.NEGATIVE_INFINITY;
+        }
+        else{
+            return 0;
+        }
+    }
+    function gananBlancas(){
+            let fichasConectadasCopy = fichasConectadas(fichasBlancas[0]);
+                if (fichasConectadasCopy.length==fichasBlancas.length) {
+                    return Number.POSITIVE_INFINITY;
+                }
+                else{
+                    return 0;
+                }
     }
     function next_move_Blancas_TableroFic(Ficha,casilla,TableroFic){
         TableroFic.turno="negras";
@@ -1858,30 +2007,31 @@ function create ()
     function conversorTableroFic(TableroFic){
         fichasBlancas.forEach(element => {
             TableroFic.fichasBlancas.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
-            TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
+            TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha="blancas";
         });
         fichasNegras.forEach(element => {
             TableroFic.fichasNegras.push(new FichaFic(element.jugador,element.casillaObjeto.idTablero,element.casillaObjeto.id));
-            TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha=true;
+            TableroFic.casillasTablero[element.casillaObjeto.id].tieneFicha="negras";
         });
         return TableroFic;
     }
 
-    //    let a = gameScene.add.rectangle(900,900,ladoCasilla,ladoCasilla,0x9172AC).setInteractive();
-    //    a.on('pointerup',function() {
-    //        //a.destroy();
-    //        casillasHighlighted.forEach(element =>{
-    //            element.destroy();
-    //        });
-    //         //  centroDeMasasNegrasFunc();
-    //         //  centroDeMasasBlancasFunc();
-    //         //  distanciaMediaEquipoNegras();
-    //         //  casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
-    //         //  console.log(centroDeMasaBlancas);
-    //          console.log(getBestMoveDepth2());
-    //          //console.log(moves_blancas());
-    //     //    console.log("Blancas: "+fichasBlancas.length);
-    //    });
+       let a = gameScene.add.rectangle(900,900,ladoCasilla,ladoCasilla,0x9172AC).setInteractive();
+       a.on('pointerup',function() {
+           //a.destroy();
+           casillasHighlighted.forEach(element =>{
+               element.destroy();
+           });
+            //  centroDeMasasNegrasFunc();
+            //  centroDeMasasBlancasFunc();
+            //  distanciaMediaEquipoNegras();
+            //  casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
+            //  console.log(centroDeMasaBlancas);
+             console.log(funcEval());
+             console.log(getBestMoveDepth2());
+             //console.log(moves_blancas());
+        //    console.log("Blancas: "+fichasBlancas.length);
+       });
 
     //    arrayTablerosProfundidad2.forEach(element => {
     //         element.forEach(arrayInside =>{
@@ -1955,10 +2105,6 @@ function create ()
         //     });
         // });
         // sleep time expects milliseconds
-        setTimeout(() => {
-
-            
-            console.log("World!"); }, 2000);
 
         if (!jugadorVSjugador) {
             console.log("Are you ready for the challenge ?");
@@ -1997,6 +2143,10 @@ function create ()
         }
         moveAI();
         let indexTestPrueba=5;
+          let arrayTableroPrueba= new TableroFic();
+          conversorTableroFic(arrayTableroPrueba);
+          console.log(arrayTableroPrueba)
+          console.log(arrayTableroPrueba.funcEval());
     //    console.log(arrayTablerosProfundidad1);
     //    console.log(arrayTablerosProfundidad2);
     //    console.log(arrayTablerosProfundidad3);
