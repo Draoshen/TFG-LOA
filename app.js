@@ -4,12 +4,9 @@ var config = {
     height: 1000,
     physics: {
         default: 'arcade',
-        arcade: {
-            gravity: { y: 200 }
-        }
+
     },
     scene: {
-        preload: preload,
         create: create
     }
 };
@@ -44,7 +41,7 @@ let fichasNegras = [];
 let identificadoresTablero=[];
 let turnoPartida=false;
 let partidaAcabada=false;
-let defaultBoard=false;
+let defaultBoard=true;
 const colorFichasNegras = 0x3B292C;
 const colorFichasBlancas = 0x964C3E;
 const colorFichasPruebas= 0x44327E;
@@ -65,7 +62,7 @@ for (let i = 0; i < numFilas; i++) {
     }
     
 }
-const jugadorVSjugador = true;
+const jugadorVSjugador = false;
 function preload ()
 {
     //this.load.setBaseURL('http://labs.phaser.io');
@@ -884,7 +881,7 @@ function create ()
         }
         fichasConectadasRec(Ficha,idTablero,fichasConectadas){
             this.fichasDeAlrededor(Ficha).forEach(element => {
-                if(this.casillasTablero[map1.get(element)].tieneFicha==Ficha.jugador && !fichasConectadas.includes(element) ){
+                if(this.casillasTablero[map1.get(element)].colorFicha==Ficha.jugador && !fichasConectadas.includes(element) ){
                     fichasConectadas.push(element);
                     this.fichasConectadasRec(this.getFichaByIdBoard(element),element,fichasConectadas);
                 }
@@ -892,11 +889,64 @@ function create ()
             });
             return fichasConectadas;
         }
-
+         fichasAisladasNegras(){
+            let fichasAisladas = [];
+            this.fichasNegras.forEach( element =>{
+                //console.log(fichasConectadas(element));
+                if (this.fichasConectadas(element).length == 1) {
+                    fichasAisladas.push(element);
+                }
+            });
+            return fichasAisladas;
+        }
         
+         fichasAisladasBlancas(){
+            let fichasAisladas = [];
+            this.fichasBlancas.forEach( element =>{
+                if (this.fichasConectadas(element).length == 1) {
+                    fichasAisladas.push(element);
+                }
+            });
+            return fichasAisladas;
+        }
+        
+         puntuacionFichasAisladasNegras(){
+            let puntuacion=0;
+            let fichasAisladas=this.fichasAisladasNegras();
+            fichasAisladas.forEach(element =>{
+                let nextMovesFicha=this.moves_Ficha_Func(element).length
+                if (nextMovesFicha==0) {
+                    puntuacion+=1000;
+                }
+                else{
+                    puntuacion+=(50/(nextMovesFicha*2));
+                }
+            });
+            return puntuacion;
+        }
+         puntuacionFichasAisladasBlancas(){
+            let puntuacion=0;
+            let fichasAisladas=this.fichasAisladasBlancas();
+            fichasAisladas.forEach(element =>{
+                let nextMovesFicha=this.moves_Ficha_Func(element).length
+                if (nextMovesFicha==0) {
+                    puntuacion+=1000;
+                }
+                else{
+                    puntuacion+=(50/(nextMovesFicha*2));
+                }
+            });
+            return puntuacion;
+
+        }
+
         gananNegras(){
+
             let fichasConectadasCopy = this.fichasConectadas(this.fichasNegras[0]);
+
             if (fichasConectadasCopy.length==this.fichasNegras.length) {
+                
+
                 return Number.NEGATIVE_INFINITY;
             }
             else{
@@ -914,12 +964,14 @@ function create ()
         }
         funcEval(){
             let negrasGanan= this.gananNegras();
-            let blancasGanan=this.gananBlancas();
+            let blancasGanan= this.gananBlancas();
 
             let arrayPesos=[1000,20,1];
             let peso=arrayPesos[0]*(this.concentracionBlancas()
             -this.concentracionNegras())+arrayPesos[1]*(this.fichasEnBordeBlancas()
             -this.fichasEnBordeNegras())+this.distancia_centrTablero_CdM_Blancas()
+            -10*this.fichasAisladasBlancas().length + 10*this.fichasAisladasNegras().length
+            -this.puntuacionFichasAisladasBlancas() + this.puntuacionFichasAisladasNegras()
             -this.distancia_centrTablero_CdM_Negras()+Math.random()
             + negrasGanan +blancasGanan ;
             return peso;
@@ -1134,7 +1186,10 @@ function create ()
             }
             else{
                 //let arrayNegras=["6c","3c","4d","6e","5f"];
-                let arrayNegras=["4e","3c","4d","6e","5f"];
+                let arrayNegras=["7b","7d","2e","3h","8d","8g","7g","7h"];
+                //let arrayNegrasBlancasGanan=["6c","3c","4d","6e","5f"];
+                //let arrayNegrasDobleVictoria=["7c","3c","4d","4e","6f"];
+                //let arrayNegrasPartidaBug=["6c","6e","6g","7g","5f","5g","4f"];
                 //let arrayNegrasEjemplo=["6c","1g","3c","2g","3h"];
                 // let arrayNegras=["1c","1d","8b","8d","8e","8f","5d","5f","5g","4g","3g","3h"];
                 //let arrayNegras=["1g","2g","3h","6e","5f","1c","4d","3g"];
@@ -1174,7 +1229,11 @@ function create ()
                 }
             }
             else{
-                let arrayBlancas=["7b","7d","2e","3h","8d"];
+                //let arrayBlancas=["7b","7d","2e","3h","8d"];
+                let arrayBlancas=["6c","3c","4d","6e","5f","8h"];
+                //let arrayBlancasVictoria=["7h","7d","7c","8d"];
+                //let arrayBlancasPartida1Bug=["7d","7e","7h","6d","6f","5e","5h","4h"];
+                //let arrayBlancasDobleVictoria=["7b","7d","4c"];
                 //let arrayBlancas=["6a","5a","4a","7c","5c","2c","7f","6f","2f","5h","4h"];
                 //let arrayBlancasMenosEsMas=["8e","6e","3a","4b","1g","4h","4d","1f"];
                 //let arrayBlancasStalemate=["7e","6b","6d","6f","6h","5e","3e","2b","2d","2f","2h","1e"];
@@ -1940,12 +1999,14 @@ function create ()
         let blancasGanan=gananBlancas();
 
 
-        let arrayPesos=[1000,20,1];
+        let arrayPesos=[100,20,1];
 
 
         let peso=arrayPesos[0]*(concentracionBlancas()-concentracionNegras())
         +arrayPesos[1]*(fichasEnBordeBlancas()
         -fichasEnBordeNegras())+distancia_centrTablero_CdM_Blancas()
+        -10*fichasAisladasBlancas().length + 10*fichasAisladasNegras().length
+        -puntuacionFichasAisladasBlancas() + puntuacionFichasAisladasNegras()
         -distancia_centrTablero_CdM_Negras()+Math.random()+blancasGanan+negrasGanan;
         
         return peso;
@@ -2027,8 +2088,10 @@ function create ()
             //  distanciaMediaEquipoNegras();
             //  casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
             //  console.log(centroDeMasaBlancas);
+             console.log(fichasAisladasBlancas());
+             console.log(puntuacionFichasAisladasBlancas());
+             console.log(puntuacionFichasAisladasNegras());
              console.log(funcEval());
-             console.log(getBestMoveDepth2());
              //console.log(moves_blancas());
         //    console.log("Blancas: "+fichasBlancas.length);
        });
@@ -2078,7 +2141,7 @@ function create ()
                     if (valor_funcEval<min) {
                         min=valor_funcEval;
                         treePrueba.children[index].valEval=valor_funcEval;
-                        treePrueba.children[index].TableroFic=element.val
+                        treePrueba.children[index].tableroFic=element.val
                     }
                 })
             }
@@ -2087,24 +2150,209 @@ function create ()
             treePrueba.children.forEach(element =>{
                 if (element.valEval>max) {
                     treePrueba.valEval=element.valEval;
-                    treePrueba.tableroFic=element.TableroFic;
+                    treePrueba.tableroFic=element.tableroFic;
                     max=element.valEval;
                 }
             });
+            if(treePrueba.tableroFic==null){
+                console.log("Hola");
+                treePrueba.tableroFic=treePrueba.children[0].tableroFic;
+            }
+            console.log(treePrueba);
             const iterator1 = treePrueba.tableroFic.mapMovePrimigenio;
             console.log();
             let nextMove =new MovementFichaFic(iterator1.keys().next().value,iterator1.values().next().value);
             return nextMove;
         }
-        //----------------Si quieres más de profundidad 3 descomenta
-        // arrayTablerosProfundidad3.forEach(element => {
-        //     element.forEach(arrayInside =>{
+
+        function arbolDepth1(){
+            let arrayTablerosProfundidad1= [];
+            let arbolGanador=new Tree("Move Blancas");
+            updateArrayTablerosProfundidad1(arrayTablerosProfundidad1);
+
+            let treePrueba= new Tree("Move Blancas");
+            arrayTablerosProfundidad1.forEach(element =>{
+                treePrueba.addChild(element);
+            });
+            for (let index = 0; index < treePrueba.children.length; index++) {
+                let gananBlancas=treePrueba.children[index].val.gananBlancas();
+                if (gananBlancas==Number.POSITIVE_INFINITY) {
+                    console.log(treePrueba.children[index]);
+                    arbolGanador.tableroFic=treePrueba.children[index].val;
+                    return arbolGanador
+                }
+                let gananNegras=treePrueba.children[index].val.gananNegras();
+                if (gananNegras==Number.NEGATIVE_INFINITY) {
+                    
+                }
                 
-        //             arrayTablerosProfundidad4.push(arrayInside.all_next_moves_TableroFic());
-               
-        //     });
-        // });
-        // sleep time expects milliseconds
+            }
+            return treePrueba;
+        }
+        function arbolDepth2(){
+
+            let treePrueba=arbolDepth1();
+            treePrueba.children.forEach(element =>{
+                let tableroPruebaProfundidad2=element.val.all_next_moves_TableroFic();
+                tableroPruebaProfundidad2.forEach(subelement =>{
+                    element.addChild(subelement);
+                });
+            });
+            return treePrueba;
+        }
+        function arbolDepth3(){
+            let treePrueba=arbolDepth2();
+            treePrueba.children.forEach(element =>{
+                //console.log(element);
+                element.children.forEach(subelement =>{
+                    let tableroPruebaProfundidad3=subelement.val.all_next_moves_TableroFic();
+                    tableroPruebaProfundidad3.forEach(insideElement =>{
+                        subelement.addChild(insideElement);
+                    })
+                });
+            });
+            return treePrueba;
+
+        }
+
+        function fichasAisladasNegras(){
+            let fichasAisladas = [];
+            fichasNegras.forEach( element =>{
+                //console.log(fichasConectadas(element));
+                if (fichasConectadas(element).length == 1) {
+                    fichasAisladas.push(element);
+                }
+            });
+            return fichasAisladas;
+        }
+
+
+        function fichasAisladasBlancas(){
+            let fichasAisladas = [];
+            fichasBlancas.forEach( element =>{
+                if (fichasConectadas(element).length == 1) {
+                    fichasAisladas.push(element);
+                }
+            });
+            return fichasAisladas;
+        }
+
+        function puntuacionFichasAisladasNegras(){
+            let puntuacion=0;
+            let fichasAisladas=fichasAisladasNegras();
+            fichasAisladas.forEach(element =>{
+                let nextMovesFicha=moves_Ficha_Func(element).length
+                if (nextMovesFicha==0) {
+                    puntuacion+=500;
+                }
+                else{
+                    puntuacion+=(50/(nextMovesFicha*2));
+                }
+            });
+            return puntuacion;
+        }
+        function puntuacionFichasAisladasBlancas(Ficha){
+            let puntuacion=0;
+            let fichasAisladas=fichasAisladasBlancas();
+            fichasAisladas.forEach(element =>{
+                let nextMovesFicha=moves_Ficha_Func(element).length
+                if (nextMovesFicha==0) {
+                    puntuacion+=500;
+                }
+                else{
+                    puntuacion+=(50/(nextMovesFicha*2));
+                }
+            });
+            return puntuacion;
+
+        }
+        function getBestMoveDepth3(){
+            let numberElements=0;
+            let arrayTablerosProfundidad1= [];
+            updateArrayTablerosProfundidad1(arrayTablerosProfundidad1);
+
+            let treePrueba= arbolDepth3();
+            for (let indexTreeDepth1 = 0; indexTreeDepth1 < treePrueba.children.length; indexTreeDepth1++) {
+
+                for (let indexTreeDepth2 = 0; indexTreeDepth2 < treePrueba.children[indexTreeDepth1].children.length; indexTreeDepth2++) {
+                    let max=Number.NEGATIVE_INFINITY;
+                    treePrueba.children[indexTreeDepth1].children[indexTreeDepth2].children.forEach(element =>{
+                        let valor_funcEval=element.val.funcEval();
+
+                        if (valor_funcEval>=max) {
+                            treePrueba.children[indexTreeDepth1].children[indexTreeDepth2].valEval=valor_funcEval;
+                            treePrueba.children[indexTreeDepth1].children[indexTreeDepth2].tableroFic=element.val
+                        }
+                        numberElements++
+                    });
+                    
+                }
+
+            }
+
+            //Segunda tanda
+            for (let indexTreeDepth1 = 0; indexTreeDepth1 < treePrueba.children.length; indexTreeDepth1++) {
+                let min=Number.POSITIVE_INFINITY;
+                for (let indexTreeDepth2 = 0; indexTreeDepth2 < treePrueba.children[indexTreeDepth1].children.length; indexTreeDepth2++){
+                    // console.log(treePrueba.children[indexTreeDepth1].children[indexTreeDepth2]);
+                    if (treePrueba.children[indexTreeDepth1].children[indexTreeDepth2].valEval<=min) {
+                        treePrueba.children[indexTreeDepth1].valEval=treePrueba.children[indexTreeDepth1].children[indexTreeDepth2].valEval;
+                        treePrueba.children[indexTreeDepth1].tableroFic=treePrueba.children[indexTreeDepth1].children[indexTreeDepth2].val
+                    }
+                }
+            }
+
+            //Última tanda
+            let maxMAX= Number.NEGATIVE_INFINITY;
+            for (let indexTreeDepth1 = 0; indexTreeDepth1 < treePrueba.children.length; indexTreeDepth1++) {
+                if(treePrueba.children[indexTreeDepth1].valEval>=maxMAX){
+                    maxMAX=treePrueba.children[indexTreeDepth1].valEval;
+                    treePrueba.valEval=treePrueba.children[indexTreeDepth1].valEval;
+                    treePrueba.tableroFic=treePrueba.children[indexTreeDepth1].tableroFic;
+                }
+            
+            }
+            console.log(numberElements);
+        
+
+            if(treePrueba.tableroFic==null){
+                treePrueba.tableroFic=treePrueba.children[0].tableroFic;
+            }
+            console.log(treePrueba);
+            const iterator1 = treePrueba.tableroFic.mapMovePrimigenio;
+            console.log();
+            let nextMove =new MovementFichaFic(iterator1.keys().next().value,iterator1.values().next().value);
+            return nextMove;
+        }
+        function getBestMoveDepth1(){
+            let arrayTablerosProfundidad1= [];
+            updateArrayTablerosProfundidad1(arrayTablerosProfundidad1);
+
+
+            let treePrueba= new Tree("Move Blancas");
+            arrayTablerosProfundidad1.forEach(element =>{
+                treePrueba.addChild(element);
+            });
+            for (let index = 0; index < treePrueba.children.length; index++) {
+                let max=Number.NEGATIVE_INFINITY;
+                
+                    let valor_funcEval=treePrueba.children[index].val.funcEval();
+                    treePrueba.children[index].valEval=valor_funcEval;
+                    if (valor_funcEval>max) {
+                        max=valor_funcEval;
+                        treePrueba.valEval=valor_funcEval;
+                        treePrueba.tableroFic=treePrueba.children[index].val
+                    }
+
+            }
+            
+            console.log(treePrueba.children);
+            const iterator1 = treePrueba.tableroFic.mapMovePrimigenio;
+            let nextMove =new MovementFichaFic(iterator1.keys().next().value,iterator1.values().next().value);
+            return nextMove;
+        }
+
+
 
         if (!jugadorVSjugador) {
             console.log("Are you ready for the challenge ?");
@@ -2113,7 +2361,13 @@ function create ()
             if (!jugadorVSjugador && turnoPartida==true) {
                 let posX=0;
                 let posY=0;
-                let movement =getBestMoveDepth2();
+                let movement;
+                if (fichasNegras.length>3) {
+                     movement =getBestMoveDepth2();
+                }
+                else{
+                    movement =getBestMoveDepth3();
+                }
                 let indexFichaToMove=fichasBlancas.indexOf(getFichaByIdBoard(movement.casillaFicha));
                 let indexFicha_comida=fichasNegras.indexOf(getFichaByIdBoard(movement.to_casilla));
                 if (fichasBlancas[indexFichaToMove]!=null) {
@@ -2143,10 +2397,6 @@ function create ()
         }
         moveAI();
         let indexTestPrueba=5;
-          let arrayTableroPrueba= new TableroFic();
-          conversorTableroFic(arrayTableroPrueba);
-          console.log(arrayTableroPrueba)
-          console.log(arrayTableroPrueba.funcEval());
     //    console.log(arrayTablerosProfundidad1);
     //    console.log(arrayTablerosProfundidad2);
     //    console.log(arrayTablerosProfundidad3);
