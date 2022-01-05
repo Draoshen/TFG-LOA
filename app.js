@@ -1,12 +1,17 @@
+
+
 var config = {
     type: Phaser.AUTO,
     width: 1000,
-    height: 1000,
+    height: 1200,
     physics: {
+        
         default: 'arcade',
 
     },
+    backgroundColor: '#789651',
     scene: {
+        preload: preload,
         create: create
     }
 };
@@ -37,6 +42,7 @@ let CasillasLimites=[];
 let casillasHighlighted=[];
 let fichaSeleccionada=null;
 let casillaSeleccionada=null;
+let logMovimientos=[];
 let fichasNegras = [];
 let identificadoresTablero=[];
 let turnoPartida=false;
@@ -63,17 +69,28 @@ for (let i = 0; i < numFilas; i++) {
     
 }
 const jugadorVSjugador = false;
+
+let mapBaseDeDatos = new Map();
+
 function preload ()
 {
     //this.load.setBaseURL('http://labs.phaser.io');
 
-    //this.load.image('sky', 'assets/skies/space3.png');
-    //this.load.image('logo', 'assets/sprites/phaser3-logo.png');
+    this.load.image('refresh', 'assets/refresh-svgrepo-com.svg');
+    this.load.image('backwards', 'assets/backward-svgrepo-com.svg');
     //this.load.image('red', 'assets/particles/red.png');
 }
 
 function create ()
 {   
+    class MovementLog{
+        constructor(ficha,casilla_inicial,casilla_to,ficha_comida){
+            this.ficha=ficha;
+            this.casilla_inicial=casilla_inicial;
+            this.casilla_to=casilla_to;
+            this.ficha_comida=ficha_comida;
+        }
+    }
     class fichaTablero {
         constructor(casilla,jugador,gameScene,casillaObjeto) {
             
@@ -963,19 +980,21 @@ function create ()
             }
         }
         funcEval(){
+           
             let negrasGanan= this.gananNegras();
             let blancasGanan= this.gananBlancas();
 
             let arrayPesos=[1000,20,1];
             let peso=arrayPesos[0]*(this.concentracionBlancas()
-            -this.concentracionNegras())+arrayPesos[1]*(this.fichasEnBordeBlancas()
+            -this.concentracionNegras())+arrayPesos[1]*(-4*this.fichasEnBordeBlancas()
             -this.fichasEnBordeNegras())+this.distancia_centrTablero_CdM_Blancas()
             -10*this.fichasAisladasBlancas().length + 10*this.fichasAisladasNegras().length
             -this.puntuacionFichasAisladasBlancas() + this.puntuacionFichasAisladasNegras()
             -this.distancia_centrTablero_CdM_Negras()+Math.random()
             + negrasGanan +blancasGanan ;
+            
             return peso;
-        }
+        } 
     }
     class CasillaFic{
         constructor(color,tieneFicha,id,idTablero) {
@@ -1185,15 +1204,21 @@ function create ()
                 }
             }
             else{
-                //let arrayNegras=["6c","3c","4d","6e","5f"];
-                let arrayNegras=["7b","7d","2e","3h","8d","8g","7g","7h"];
+                let arrayNegras=["6c","3c","4d","6e","5f"];
+                //let arrayNegrasEstrategiaEncontrarMovimientoGanador=["8b","8d","8e","5d","5f","5g","4g","3g","3h","1c","1d"];
+                //let arrayNegrasMenosEsMas=["2c","2e"];
+                //let arrayNegrasBloqueoEstrategia=["1c","1g","2g","3g","3h","4d","5f","6e"];
+                //let arrayNegrasBlancasGananEstrategia=["6a","5b","4b","3b","8d","8e","8f","7f","6g","5g","4f"];
+                //let arrayNegrasGanan=["7d","6d","5c","4d","3d","2e"];
+                //let arrayNegrasEjemploMovimiento=["3d","6c","6d"];
+                //let arrayNegras=["7b","7d","2e","3h","8d","8g","7g","7h"];
                 //let arrayNegrasBlancasGanan=["6c","3c","4d","6e","5f"];
                 //let arrayNegrasDobleVictoria=["7c","3c","4d","4e","6f"];
                 //let arrayNegrasPartidaBug=["6c","6e","6g","7g","5f","5g","4f"];
                 //let arrayNegrasEjemplo=["6c","1g","3c","2g","3h"];
                 // let arrayNegras=["1c","1d","8b","8d","8e","8f","5d","5f","5g","4g","3g","3h"];
                 //let arrayNegras=["1g","2g","3h","6e","5f","1c","4d","3g"];
-                //let arrayNegrasBlock=["6g","5g","4g","3g","3b","1c","1d","3g"];
+                //let arrayNegrasBloqueo=["6g","5g","4g","3g","3b","1c","1d","3g"];
                 //let arrayNegrasEjemplo=["8d","8e","8f","7f","6g","5g","4f","6a","5b","4b","3b"];
                 //let arrayNegrasStaleMate=["7c","7g","5c","5g","4b","4d","4f","4h","3c","3g","1c","1g"];
                 // let arrayNegras=["6d","5e","4d","3e","2d"];
@@ -1229,8 +1254,13 @@ function create ()
                 }
             }
             else{
-                //let arrayBlancas=["7b","7d","2e","3h","8d"];
-                let arrayBlancas=["6c","3c","4d","6e","5f","8h"];
+                let arrayBlancas=["7b","7d","2e","3h","8d"];
+                //let arrayBlancasEstrategiaEncontrarMovimientoGanador=["6a","5a","4a","7c","5c","2c","7f","6f","2f","5h","4h"];
+                //let arrayBlancasEstrategiaMenosEsMas=["6e","4d","4b","8e","4h","6e","3a","1f",""];
+                //let arrayBlancasBloqueoEstrategia=["8e","2e","2h","1h"];
+                //let arrayBlancasGananEstrategias=["4c","6d","5d","4e","6e","7e","5f","6f","4g","4h"];
+                //let arrayBlancasNegrasGanan=["8b","8c","8d","6e","5d","5f","4e","4f","3c","2h"];
+                //let arrayBlancasEjemploMovimiento=["2a","7a","8c","5e","4d","3e","1f","7h","5h","2h"];
                 //let arrayBlancasVictoria=["7h","7d","7c","8d"];
                 //let arrayBlancasPartida1Bug=["7d","7e","7h","6d","6f","5e","5h","4h"];
                 //let arrayBlancasDobleVictoria=["7b","7d","4c"];
@@ -1752,14 +1782,14 @@ function create ()
             let fichasConectadasCopy = fichasConectadas(fichasBlancas[0]);
                 if (fichasConectadasCopy.length==fichasBlancas.length) {
                     partidaAcabada=true;
-                    alert("Ganan Blancas");
+                    alert("Ganan Blancas \nDale al botón de refrescar si quieres seguir jugando");
                 }
         }
         function terminarPartidaNegras(){
             let fichasConectadasCopy = fichasConectadas(fichasNegras[0]);
                 if (fichasConectadasCopy.length==fichasNegras.length) {
                     partidaAcabada=true;
-                    alert("Ganan Negras");
+                    alert("Ganan Negras\nDale al botón de refrescar si quieres seguir jugando");
                 }
         }
         function oppositeColor(Ficha){
@@ -1792,6 +1822,9 @@ function create ()
                 element.destroy();
             });
             movesFicha.forEach(element => {
+                let casilla_destino;
+                let casilla_inicial;
+                let ficha_comida=false;
                 let jugador = Ficha.jugador;
                 let casillaPintar=casillasBoard[map1.get(element)];
                 casillasHighlighted[indexMoves]=gameScene.add.rectangle(casillaPintar.posX,casillaPintar.posY,ladoCasilla,ladoCasilla);
@@ -1799,16 +1832,20 @@ function create ()
                 casillasHighlighted[indexMoves].setStrokeStyle(4, 0x9172AC);
                 casillasHighlighted[indexMoves].setInteractive().on('pointerup',function(){
                     if (Ficha!=null) {
+                        casilla_inicial=Ficha.casillaObjeto.idTablero;
                         Ficha.fichaCanvas.destroy();
                         Ficha.casillaObjeto.tieneFicha=false;
                         Ficha.casilla=null;
                         Ficha=null;
+                        
                     }
                     if (casillasBoard[mapCasillasHighlighted.get(this)].tieneFicha) {
-
+                        ficha_comida=true;
                         getFichaByCasillasBoard(casillasBoard[mapCasillasHighlighted.get(this)]);
                     }
+                    casilla_destino=casillasBoard[mapCasillasHighlighted.get(this)].idTablero;
                     Ficha=new fichaTablero(casillas[mapCasillasHighlighted.get(this)],jugador,gameScene,casillasBoard[mapCasillasHighlighted.get(this)]);
+                    logMovimientos.push(new MovementLog(Ficha,casilla_inicial,casilla_destino,ficha_comida));
                     if (jugador=="blancas") {
                         fichasBlancas.push(Ficha);
                         turnoPartida=false;
@@ -2077,23 +2114,48 @@ function create ()
         return TableroFic;
     }
 
-       let a = gameScene.add.rectangle(900,900,ladoCasilla,ladoCasilla,0x9172AC).setInteractive();
-       a.on('pointerup',function() {
-           //a.destroy();
-           casillasHighlighted.forEach(element =>{
-               element.destroy();
-           });
-            //  centroDeMasasNegrasFunc();
-            //  centroDeMasasBlancasFunc();
-            //  distanciaMediaEquipoNegras();
-            //  casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
-            //  console.log(centroDeMasaBlancas);
-             console.log(fichasAisladasBlancas());
-             console.log(puntuacionFichasAisladasBlancas());
-             console.log(puntuacionFichasAisladasNegras());
-             console.log(funcEval());
-             //console.log(moves_blancas());
-        //    console.log("Blancas: "+fichasBlancas.length);
+    //    let a = gameScene.add.rectangle(250,1000,ladoCasilla,ladoCasilla,0x9172AC).setInteractive();
+    //    a.on('pointerup',function() {
+    // //        //a.destroy();
+    // //        casillasHighlighted.forEach(element =>{
+    // //            element.destroy();
+    // //        });
+    // //         //  centroDeMasasNegrasFunc();
+    // //         //  centroDeMasasBlancasFunc();
+    // //         //  distanciaMediaEquipoNegras();
+    // //         //  casillasBoard[map1.get(""+centroDeMasaNegras.posX+letrasTablero[(centroDeMasaNegras.posY-1)])].casillaCanvas.setStrokeStyle(4,0x2BB26E);
+    // //         //  console.log(centroDeMasaBlancas);
+    // //         let pruebaTablero = new TableroFic();
+    // //          console.log(conversorTableroFic(pruebaTablero));
+    // //          console.log(mapBaseDeDatos.get(objectHash(pruebaTablero)));
+    // //          console.log(puntuacionFichasAisladasBlancas());
+    // //          console.log(puntuacionFichasAisladasNegras());
+    //          console.log(funcEval());
+    //          //console.log(moves_blancas());
+    //     //    console.log("Blancas: "+fichasBlancas.length);
+    //    });
+       let mapaPrueba= new Map();
+       mapaPrueba.set(1,"culo");
+       let retroceder = gameScene.add.rectangle(360,960,160,60,0x9991BD).setInteractive();
+       let clickado = false;
+       retroceder.on('pointerup',function() {
+             setTimeout(function() {
+                retroceder.setStrokeStyle(0,0xF1E943);
+            }, 100);
+            console.log(logMovimientos);
+                retrocederMove();
+                retroceder.setStrokeStyle(4,0xF1E943);
+               
+
+       });
+       let refrescarBoton = gameScene.add.rectangle(540,960,160,60,0x9991BD).setInteractive();
+       
+       refrescarBoton.on('pointerup',function() {
+            setTimeout(function() {
+                refrescarBoton.setStrokeStyle(0,0xF1E943);
+            }, 100);
+            refrescar();
+            refrescarBoton.setStrokeStyle(4,0xF1E943);
        });
 
     //    arrayTablerosProfundidad2.forEach(element => {
@@ -2266,6 +2328,7 @@ function create ()
             return puntuacion;
 
         }
+
         function getBestMoveDepth3(){
             let numberElements=0;
             let arrayTablerosProfundidad1= [];
@@ -2324,6 +2387,91 @@ function create ()
             let nextMove =new MovementFichaFic(iterator1.keys().next().value,iterator1.values().next().value);
             return nextMove;
         }
+
+        function removeAllFichas(){
+            fichasNegras.forEach(element =>{
+                    element.fichaCanvas.destroy();
+                    element.casillaObjeto.tieneFicha=false;
+                    element.casilla=null;
+            });
+            fichasBlancas.forEach(element =>{
+                element.fichaCanvas.destroy();
+                element.casillaObjeto.tieneFicha=false;
+                element.casilla=null;
+            });
+        }
+        function refrescar(){
+            removeAllFichas();
+            colocarFichasBlancas();
+            colocarFichasNegras();
+            casillasHighlighted.forEach(element =>{
+               element.destroy();
+           });
+           turnoPartida=false;
+           partidaAcabada=false;
+           logMovimientos=[];
+           if (casillaSeleccionada!=null) {
+            casillaSeleccionada.destroy();
+           }
+        }
+        function retrocederMove(){
+            console.log(logMovimientos);
+            if (logMovimientos.length>=1) {
+                if (jugadorVSjugador) {
+                    let copia = logMovimientos.pop();
+                }
+                else{
+                    let check="";
+                    let fichaComida;
+                    let copia = logMovimientos.pop();
+                    let FichaA=getFichaByIdBoard(copia.casilla_to);
+                    console.log(FichaA);
+                    FichaA.fichaCanvas.destroy();
+                    FichaA.casillaObjeto.tieneFicha=false;
+                    FichaA.casilla=null;
+                    FichaA=null;
+
+                    let Ficha=new fichaTablero(casillas[map1.get(copia.casilla_inicial)],copia.ficha.jugador,gameScene,casillasBoard[map1.get(copia.casilla_inicial)]);
+                    fichasBlancas.push(Ficha);
+                    if (copia.ficha_comida) {
+                        fichaComida=new fichaTablero(casillas[map1.get(copia.casilla_to)],oppositeColor(copia.ficha),gameScene,casillasBoard[map1.get(copia.casilla_to)]);
+                        fichasNegras.push(fichaComida);
+                        check=copia.casilla_to;
+                    }
+                    
+
+                    copia = logMovimientos.pop();
+                    if (check===copia.casilla_to) {
+                        fichaComida.fichaCanvas.destroy();
+                        fichaComida.casillaObjeto.tieneFicha=false;
+                        fichaComida.casilla=null
+                        fichasNegras.pop();
+                    }   
+
+                    FichaA=getFichaByIdBoard(copia.casilla_to);
+                    FichaA.fichaCanvas.destroy();
+                    FichaA.casillaObjeto.tieneFicha=false;
+                    FichaA.casilla=null;
+                    FichaA=null;
+
+                    Ficha=new fichaTablero(casillas[map1.get(copia.casilla_inicial)],copia.ficha.jugador,gameScene,casillasBoard[map1.get(copia.casilla_inicial)]);
+                    fichasNegras.push(Ficha);
+                    if (copia.ficha_comida) {
+                        let fichaComida=new fichaTablero(casillas[map1.get(copia.casilla_to)],oppositeColor(copia.ficha),gameScene,casillasBoard[map1.get(copia.casilla_to)]);
+                        fichasBlancas.push(fichaComida);
+                    }
+                }
+            }
+            casillasHighlighted.forEach(element =>{
+                element.destroy();
+            });
+            if (casillaSeleccionada!=null) {
+             casillaSeleccionada.destroy();
+            }
+            reciclar(fichasNegras);
+            reciclar(fichasBlancas);
+
+        }
         function getBestMoveDepth1(){
             let arrayTablerosProfundidad1= [];
             updateArrayTablerosProfundidad1(arrayTablerosProfundidad1);
@@ -2368,6 +2516,10 @@ function create ()
                 else{
                     movement =getBestMoveDepth3();
                 }
+                let casilla_inicial=movement.casillaFicha;
+                let casilla_destino=movement.to_casilla;
+                let ficha_comida=false;
+
                 let indexFichaToMove=fichasBlancas.indexOf(getFichaByIdBoard(movement.casillaFicha));
                 let indexFicha_comida=fichasNegras.indexOf(getFichaByIdBoard(movement.to_casilla));
                 if (fichasBlancas[indexFichaToMove]!=null) {
@@ -2378,11 +2530,13 @@ function create ()
                     fichasBlancas[indexFichaToMove].casilla=null;
                 }
                 if (fichasNegras[indexFicha_comida]!=null) {
+                    ficha_comida=true;
                     fichasNegras[indexFicha_comida].fichaCanvas.destroy();
                     fichasNegras[indexFicha_comida].casillaObjeto.tieneFicha=false;
                     fichasNegras[indexFicha_comida].casilla=null;
                 }
                 let Ficha=new fichaTablero(casillas[map1.get(movement.to_casilla)],"blancas",gameScene,casillasBoard[map1.get(movement.to_casilla)]);
+                logMovimientos.push(new MovementLog(Ficha,casilla_inicial,casilla_destino,ficha_comida));
                 fichaSeleccionada=Ficha.fichaCanvas;
                 fichaSeleccionada.setStrokeStyle(4,0xE5E228);
                 casillaSeleccionada=gameScene.add.rectangle(posX,posY,ladoCasilla,ladoCasilla);
@@ -2396,6 +2550,10 @@ function create ()
             }
         }
         moveAI();
+        let refresh=this.add.image(540, 960, 'refresh');
+        refresh.setScale(0.35);
+        let backwards=this.add.image(360, 960, 'backwards');
+        backwards.setScale(0.1);
         let indexTestPrueba=5;
     //    console.log(arrayTablerosProfundidad1);
     //    console.log(arrayTablerosProfundidad2);

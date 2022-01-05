@@ -1,0 +1,156 @@
+@import url("https://cdn.rawgit.com/dreampulse/computer-modern-web-font/master/fonts.css");
+@import url("https://fonts.googleapis.com/css2?family=Pushster&display=swap");
+body {
+  background: #789651;
+  margin: 0;
+  font-family: "Computer Modern Sans";
+  font-size: 2em;
+  text-align: left;
+}
+
+body .primary-nav {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+  position: -webkit-sticky;
+  /* Safari */
+  position: sticky;
+  top: 0;
+  font-size: xx-large;
+  font-family: 'Pushster', cursive;
+}
+
+body .primary-nav a {
+  color: red;
+}
+
+body .primary-nav li {
+  float: right;
+  display: block;
+  color: white;
+  text-align: right;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+body .primary-nav li:hover {
+  background-color: #EEDCC3;
+}
+
+body .primary-nav .logo {
+  float: left;
+  display: block;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+h1 {
+  text-align: center;
+  color: #ddcdcd;
+}
+
+.footer {
+  position: relative;
+  text-align: center;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+  position: -webkit-sticky;
+  /* Safari */
+  position: sticky;
+  top: 0;
+  font-size: x-large;
+  font-family: 'Pushster', cursive;
+}
+
+.footer img.right_image {
+  float: left;
+}
+
+.footer ul li {
+  display: block;
+  color: white;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+.footer ul li:hover {
+  background-color: #EEDCC3;
+}
+
+.footer img {
+  padding: 1em 2em;
+  float: right;
+  height: 75px;
+  width: 75px;
+}
+
+.move_backwards {
+  position: relative;
+  color: #EEDCC3;
+  bottom: -1.55em;
+  left: 0;
+}
+
+section {
+  padding: default;
+  text-align: center;
+}
+
+section ul {
+  text-align: left;
+}
+
+section div {
+  width: 30em;
+  margin: auto;
+}
+
+section div.espacio {
+  height: 3em;
+}
+
+section span.Bold {
+  font-weight: bold;
+}
+
+section span.Italic {
+  font-style: italic;
+}
+
+section .juego {
+  height: 550px;
+  width: 550px;
+}
+
+h5 {
+  text-align: center;
+  color: #ddcdcd;
+}
+
+.Agresivo {
+  font-family: 'Pushster', cursive;
+  color: #e6e954;
+}
+
+span.logo:hover {
+  background-color: #EEDCC3;
+}
+
+a {
+  color: white;
+}
+
+a:hover {
+  color: #e6e954;
+}
+
+.help {
+  color: blue;
+}
+/*# sourceMappingURL=main.css.map */
